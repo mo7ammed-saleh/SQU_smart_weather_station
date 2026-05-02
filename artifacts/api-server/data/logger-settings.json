@@ -1,0 +1,6 @@
+{
+  "intervalLabel": "Every 5 minutes",
+  "intervalCode": "5M",
+  "updatedAt": "2026-04-28T12:00:00.000Z",
+  "message": "Default sampling interval. Update via the dashboard."
+}

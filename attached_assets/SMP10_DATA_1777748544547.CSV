@@ -1,0 +1,7 @@
+
+Timestamp,IO SCALE FACTOR,SMP Broad Irradiance  (W/m²),SMP Raw Irradiance  (W/m²),Body Temperature  (°C),IO Operation Mode ,IO STATUS FLAG 
+"28/04/2026, 15:55", 0, 508, 517, 41.5, 1, 8
+"28/04/2026, 16:00", 0, 491, 501, 41.3, 1, 8
+"28/04/2026, 16:05", 0, 469, 478, 41.4, 1, 8
+"28/04/2026, 16:10", 0, 450, 459, 41.1, 1, 8
+"28/04/2026, 16:15", 0, 434, 442, 41.0, 1, 8

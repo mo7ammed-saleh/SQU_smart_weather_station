@@ -1,0 +1,580 @@
+You are a senior full-stack developer and UI/UX designer.
+
+Build a modern animated Weather Station Monitoring Dashboard in Replit.
+
+PROJECT CONTEXT
+I have a SQU Weather Station project using a DataTaker DT80W Series 4 data logger. The logger records data from 4 sensors. My current workflow is:
+
+1. DataTaker DT80W logs sensor data into .DBD files by schedule.
+2. A Python script connects to DT80W by FTP.
+3. The script downloads the DBD files:
+   - DATA_A.DBD
+   - DATA_B.DBD
+   - DATA_C.DBD
+   - DATA_D.DBD
+4. The script converts them into CSV files using dump_dbd.exe.
+5. Each sensor has its own CSV file:
+   - AQT560_DATA.CSV
+   - WS500_DATA.CSV
+   - SMP10_DATA.CSV
+   - DR30_DATA.CSV
+6. The dashboard must read these CSV files and display the latest readings and historical data.
+
+Important:
+For now, create 4 sample CSV files with realistic dummy readings so the website works immediately.
+Later, I will replace these CSV files with the real CSV files from my Python script.
+
+MAIN REQUIREMENT
+Create a complete dashboard web app with:
+- Login page
+- Main home page
+- 4 sensor pages
+- CSV reading
+- Date/time filtering
+- Excel export
+- Logging interval selection
+- Beautiful animated UI
+- Header and footer
+- Responsive layout
+
+TECH STACK
+Use a simple, clean stack that works well in Replit.
+
+Preferred:
+- React + Vite frontend
+- Node.js + Express backend
+- Tailwind CSS for styling
+- Recharts for charts
+- PapaParse or csv-parser for CSV reading
+- ExcelJS or xlsx for Excel export
+- lucide-react for icons
+- framer-motion for animations
+
+The app should run with:
+npm install
+npm run dev
+
+Use one command to run backend and frontend together if needed.
+
+GENERAL UI STYLE
+Design a modern professional weather station dashboard.
+
+Style direction:
+- Clean scientific monitoring dashboard
+- Light theme by default
+- White / soft gray background
+- Cyan / blue accent color
+- Glassmorphism cards
+- Smooth shadows
+- Rounded cards
+- Animated page transitions
+- Animated cards on load
+- Responsive for desktop, tablet, and mobile
+- Professional university / engineering style
+- Header and footer included
+- Sidebar on the right side because Arabic/RTL layout may be used later
+- Keep English labels for now, but structure must allow Arabic labels later
+
+APP STRUCTURE
+The dashboard must have 5 main pages after login:
+
+1. Home / Overview page
+2. AQT560 Sensor page
+3. WS500 Sensor page
+4. SMP10 Sensor page
+5. DR30 Sensor page
+
+There must also be:
+0. Login page
+
+LOGIN PAGE
+Create a login page with:
+- System title: SQU Weather Station Dashboard
+- Subtitle: Environmental Monitoring System
+- Username input
+- Password input
+- Login button
+- Clean animated card
+
+Use simple frontend authentication for now:
+username: admin
+password: admin123
+
+After login, redirect to the Home page.
+Store login state in localStorage.
+Add logout button in the header/sidebar.
+
+MAIN LAYOUT
+After login, the layout should include:
+
+1. Header
+   - Logo/icon placeholder
+   - Title: Weather Station Monitoring
+   - Small status badge: Online
+   - Current date/time
+   - Logout button
+
+2. Right Sidebar Navigation
+   Sidebar should contain:
+   - Home
+   - AQT560_DATA
+   - WS500_DATA
+   - SMP10_DATA
+   - DR30_DATA
+
+Each item should have an icon and active state.
+
+3. Main content area
+   - Page title
+   - Summary cards
+   - Charts
+   - Tables
+   - Filters
+
+4. Footer
+   Text:
+   SQU Weather Station Monitoring System © 2026
+   Developed for environmental data monitoring
+
+HOME PAGE REQUIREMENTS
+The Home page is the main system overview page.
+
+It must contain:
+1. Company / organization logo placeholder
+2. Organization name:
+   Sultan Qaboos University Weather Station
+3. Short company/system description:
+   "This dashboard monitors environmental and air quality data collected from multiple sensors connected to the DataTaker DT80W data logger. The system converts logged DBD files into CSV files and displays readings, trends, and downloadable reports."
+
+4. Sensor summary cards:
+   - AQT560 Air Quality Sensor
+   - WS500 Smart Weather Sensor
+   - SMP10 Particulate Sensor
+   - DR30 Radiation / Rain / Measurement Sensor
+
+Each card should show:
+- Sensor name
+- Latest timestamp
+- Number of parameters
+- Latest main reading
+- View button
+
+5. Data logger control section:
+   Title: Data Logger Sampling Interval
+
+This section must allow the user to choose how often the logger records data.
+
+Dropdown options:
+- Every 15 minutes
+- Every 30 minutes
+- Every 45 minutes
+- Every 1 hour
+- Every 2 hours
+- Every 3 hours
+- Every 4 hours
+- Every 1 day
+
+Value mapping:
+15 minutes = 15M
+30 minutes = 30M
+45 minutes = 45M
+1 hour = 1H
+2 hours = 2H
+3 hours = 3H
+4 hours = 4H
+1 day = 1D
+
+Add button:
+Apply Interval to Logger
+
+For now:
+- Do not actually connect to the real DT80W yet.
+- Create backend endpoint:
+  POST /api/logger/interval
+- It receives selected interval.
+- Save it into a local JSON file:
+  data/logger-settings.json
+- Return success message.
+- Show UI toast/message:
+  "Sampling interval updated successfully. Logger command integration can be added later."
+
+Important future note:
+Later this endpoint will send the required command/program update to the DataTaker DT80W to change schedule interval.
+
+6. Excel download section:
+   Title: Download Excel Report
+
+User can select:
+- Sensor dropdown:
+  - All sensors
+  - AQT560_DATA
+  - WS500_DATA
+  - SMP10_DATA
+  - DR30_DATA
+- From date/time
+- To date/time
+- Export button
+
+When user clicks Export:
+- Backend filters CSV data by timestamp
+- Creates Excel file
+- If "All sensors" selected, create one Excel workbook with 4 sheets:
+  - AQT560_DATA
+  - WS500_DATA
+  - SMP10_DATA
+  - DR30_DATA
+- If one sensor selected, create one Excel file with one sheet
+- Download the Excel file
+
+Endpoint:
+GET /api/export/excel?sensor=all&from=YYYY-MM-DDTHH:mm&to=YYYY-MM-DDTHH:mm
+
+SENSOR PAGES
+Each sensor page must show:
+
+1. Page heading:
+   Parameters for [Sensor Name]
+
+2. Latest reading cards
+Each parameter should appear as a card:
+- Icon
+- Parameter name
+- Value
+- Unit
+- Last updated timestamp
+
+3. Filters section
+User can filter data:
+- From date/time
+- To date/time
+- Apply filter button
+- Reset filter button
+
+4. Chart section
+Show line chart for selected parameter.
+Include dropdown:
+- Select parameter to plot
+
+Chart requirements:
+- X-axis = timestamp
+- Y-axis = selected parameter value
+- Tooltip
+- Legend
+- Responsive chart
+- Smooth animation
+
+5. Data table
+Show filtered data in table:
+- Timestamp column
+- All parameter columns
+- Pagination or simple scroll table
+- Search box optional
+
+6. Export button
+Download Excel for this sensor and selected date range.
+
+CSV FILES
+Create a folder:
+backend/data/csv/
+
+Create 4 sample CSV files:
+
+1. AQT560_DATA.CSV
+Columns:
+timestamp,air_temperature_c,air_humidity_percent,air_pressure_hpa,no2_ug_m3,no2_ppb,so2_ug_m3,so2_ppb,co_ug_m3,co_ppb,h2s_ug_m3,h2s_ppb,o3_ug_m3,o3_ppb
+
+2. WS500_DATA.CSV
+Columns:
+timestamp,relative_humidity_percent,air_pressure_hpa,wind_dir_min_deg,wind_dir_max_deg,compass_deg,precipitation_type_code,wind_quality_code,global_radiation_w_m2,air_temperature_c,wind_chill_temperature_c,heating_temperature_wind_c,heating_temperature_r2s_c,wind_speed_m_s,wind_speed_max_m_s,dew_point_c
+
+3. SMP10_DATA.CSV
+Columns:
+timestamp,pm1_ug_m3,pm2_5_ug_m3,pm4_ug_m3,pm10_ug_m3,particle_count_0_3um,particle_count_0_5um,particle_count_1_0um,particle_count_2_5um,particle_count_5_0um,particle_count_10um,temperature_c,humidity_percent
+
+4. DR30_DATA.CSV
+Columns:
+timestamp,solar_radiation_w_m2,rain_mm,rain_intensity_mm_h,battery_voltage_v,panel_temperature_c,status_code
+
+Generate realistic sample data:
+- At least 7 days of data
+- Reading every 30 minutes
+- Timestamp format:
+  2026-04-28 16:30:00
+
+BACKEND REQUIREMENTS
+Create Express backend.
+
+Endpoints:
+
+1. GET /api/sensors
+Returns list of sensors and metadata:
+- id
+- displayName
+- csvFile
+- description
+- parameter count
+
+2. GET /api/sensors/:sensorId/latest
+Reads the CSV and returns latest row.
+
+3. GET /api/sensors/:sensorId/data
+Query params:
+- from
+- to
+Returns filtered CSV rows by timestamp.
+If no from/to, return all or latest reasonable amount.
+
+4. GET /api/sensors/:sensorId/parameters
+Returns parameter metadata:
+- key
+- label
+- unit
+- category
+- iconType
+
+5. GET /api/export/excel
+Query params:
+- sensor
+- from
+- to
+Creates and downloads Excel file.
+
+6. GET /api/logger/interval
+Returns current saved interval from data/logger-settings.json.
+
+7. POST /api/logger/interval
+Body:
+{
+  "intervalLabel": "Every 30 minutes",
+  "intervalCode": "30M"
+}
+
+Save into:
+backend/data/logger-settings.json
+
+Also save:
+- updatedAt timestamp
+
+Important:
+Add error handling:
+- Missing CSV file
+- Invalid sensor id
+- Invalid date range
+- Empty filtered data
+- Excel export errors
+
+FRONTEND REQUIREMENTS
+Create React frontend with routes:
+
+/login
+/
+/sensors/aqt560
+/sensors/ws500
+/sensors/smp10
+/sensors/dr30
+
+Use protected routes:
+If user not logged in, redirect to /login.
+
+Create components:
+
+src/components/
+- Layout.jsx
+- Header.jsx
+- Sidebar.jsx
+- Footer.jsx
+- SensorCard.jsx
+- ParameterCard.jsx
+- DateRangeFilter.jsx
+- ExportPanel.jsx
+- IntervalControl.jsx
+- ChartPanel.jsx
+- DataTable.jsx
+- LoadingSpinner.jsx
+- StatusBadge.jsx
+
+Create pages:
+
+src/pages/
+- Login.jsx
+- Home.jsx
+- SensorPage.jsx
+
+Create services:
+
+src/services/api.js
+
+Create config:
+
+src/config/sensors.js
+
+Make the code clean and well-commented.
+
+DATA HANDLING
+The frontend should never read CSV directly.
+Frontend calls backend API.
+Backend reads CSV and returns JSON.
+
+Timestamp parsing:
+- Accept timestamp format:
+  YYYY-MM-DD HH:mm:ss
+- Frontend date input uses:
+  datetime-local
+- Backend converts and compares correctly.
+
+PARAMETER LABELS
+Use readable labels instead of raw CSV keys.
+
+Examples:
+air_temperature_c = Air Temperature
+air_humidity_percent = Air Humidity
+air_pressure_hpa = Air Pressure
+no2_ug_m3 = NO₂
+co_ug_m3 = CO
+pm2_5_ug_m3 = PM2.5
+wind_speed_m_s = Wind Speed
+global_radiation_w_m2 = Global Radiation
+
+Units should appear separately:
+°C, %, hPa, µg/m³, ppb, m/s, W/m², mm, V
+
+DESIGN DETAILS
+Cards:
+- White background
+- Rounded 20px
+- Light border
+- Soft shadow
+- Hover lift animation
+- Active selected card should have cyan border and subtle glow
+
+Colors:
+- Primary: cyan / sky blue
+- Text: dark navy
+- Muted text: gray
+- Background: very light gray
+- Success: green
+- Warning: amber
+- Danger: red
+
+Animations:
+- Login card fade/slide in
+- Page transition fade
+- Cards stagger animation
+- Chart fade in
+- Sidebar active item smooth highlight
+
+RESPONSIVE DESIGN
+Desktop:
+- Sidebar on right
+- 4 cards per row if space allows
+
+Tablet:
+- 2 cards per row
+
+Mobile:
+- Sidebar collapses or becomes top/bottom nav
+- 1 card per row
+- Tables horizontally scroll
+
+IMPORTANT FUTURE INTEGRATION NOTE
+Add a file:
+docs/FUTURE_DT80W_INTEGRATION.md
+
+Explain:
+- Current app reads local CSV files.
+- Python script currently downloads DBD files by FTP and converts them to CSV.
+- Later, backend can call this Python script manually or on schedule.
+- Later, POST /api/logger/interval can be connected to DT80W by FTP/TCP/DeTransfer command method to update the schedule interval.
+- Current interval setting is saved locally only.
+
+PROJECT FILE STRUCTURE
+Create this structure:
+
+weather-station-dashboard/
+├── package.json
+├── README.md
+├── backend/
+│   ├── package.json
+│   ├── server.js
+│   ├── routes/
+│   │   ├── sensors.js
+│   │   ├── export.js
+│   │   └── logger.js
+│   ├── services/
+│   │   ├── csvService.js
+│   │   ├── excelService.js
+│   │   └── loggerSettingsService.js
+│   ├── config/
+│   │   └── sensors.js
+│   └── data/
+│       ├── csv/
+│       │   ├── AQT560_DATA.CSV
+│       │   ├── WS500_DATA.CSV
+│       │   ├── SMP10_DATA.CSV
+│       │   └── DR30_DATA.CSV
+│       └── logger-settings.json
+├── frontend/
+│   ├── package.json
+│   ├── index.html
+│   ├── vite.config.js
+│   └── src/
+│       ├── main.jsx
+│       ├── App.jsx
+│       ├── index.css
+│       ├── config/
+│       │   └── sensors.js
+│       ├── services/
+│       │   └── api.js
+│       ├── components/
+│       │   ├── Layout.jsx
+│       │   ├── Header.jsx
+│       │   ├── Sidebar.jsx
+│       │   ├── Footer.jsx
+│       │   ├── SensorCard.jsx
+│       │   ├── ParameterCard.jsx
+│       │   ├── DateRangeFilter.jsx
+│       │   ├── ExportPanel.jsx
+│       │   ├── IntervalControl.jsx
+│       │   ├── ChartPanel.jsx
+│       │   ├── DataTable.jsx
+│       │   ├── LoadingSpinner.jsx
+│       │   └── StatusBadge.jsx
+│       └── pages/
+│           ├── Login.jsx
+│           ├── Home.jsx
+│           └── SensorPage.jsx
+└── docs/
+    └── FUTURE_DT80W_INTEGRATION.md
+
+README REQUIREMENTS
+Write a clear README with:
+- Project overview
+- How to run in Replit
+- Login credentials
+- Folder structure
+- API endpoints
+- How to replace sample CSV with real CSV
+- How Excel export works
+- Future DT80W integration notes
+
+QUALITY REQUIREMENTS
+- Make sure the app actually runs.
+- Avoid placeholder broken imports.
+- Make sure routes work.
+- Make sure sample CSV files exist.
+- Make sure charts work.
+- Make sure Excel export downloads.
+- Make sure filter by date works.
+- Make sure sidebar navigation works.
+- Make sure login/logout works.
+- Use clean readable code.
+- Do not overcomplicate.
+- Keep the project maintainable.
+
+FINAL OUTPUT
+After creating the project, explain:
+1. How to run it
+2. Login username/password
+3. Where to replace CSV files
+4. Where interval setting is saved
+5. Which file to edit later for real DT80W connection

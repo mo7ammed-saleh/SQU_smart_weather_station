@@ -3,20 +3,25 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: SQU Weather Station API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: sensors
+    description: Sensor data operations
+  - name: export
+    description: Data export operations
+  - name: logger
+    description: Data logger configuration
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +29,187 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /sensors:
+    get:
+      operationId: listSensors
+      tags: [sensors]
+      summary: List all sensors with metadata
+      responses:
+        "200":
+          description: List of sensors
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SensorMeta"
+
+  /sensors/summary:
+    get:
+      operationId: getSensorsSummary
+      tags: [sensors]
+      summary: Get summary for all sensors (latest reading + stats)
+      responses:
+        "200":
+          description: Summary for all sensors
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SensorSummary"
+
+  /sensors/{sensorId}/latest:
+    get:
+      operationId: getSensorLatest
+      tags: [sensors]
+      summary: Get the latest reading for a sensor
+      parameters:
+        - name: sensorId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Latest sensor reading
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SensorReading"
+        "404":
+          description: Sensor not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /sensors/{sensorId}/data:
+    get:
+      operationId: getSensorData
+      tags: [sensors]
+      summary: Get sensor data with optional date filtering
+      parameters:
+        - name: sensorId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: from
+          in: query
+          schema:
+            type: string
+          description: "Start datetime (YYYY-MM-DDTHH:mm)"
+        - name: to
+          in: query
+          schema:
+            type: string
+          description: "End datetime (YYYY-MM-DDTHH:mm)"
+        - name: limit
+          in: query
+          schema:
+            type: integer
+          description: Max rows to return (default 500)
+      responses:
+        "200":
+          description: Sensor readings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SensorDataResponse"
+        "404":
+          description: Sensor not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /sensors/{sensorId}/parameters:
+    get:
+      operationId: getSensorParameters
+      tags: [sensors]
+      summary: Get parameter metadata for a sensor
+      parameters:
+        - name: sensorId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Parameter metadata
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ParameterMeta"
+        "404":
+          description: Sensor not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /export/excel:
+    get:
+      operationId: exportExcel
+      tags: [export]
+      summary: Export sensor data as Excel file
+      parameters:
+        - name: sensor
+          in: query
+          schema:
+            type: string
+          description: "Sensor ID or 'all'"
+        - name: from
+          in: query
+          schema:
+            type: string
+        - name: to
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Excel file download
+          content:
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                type: string
+                format: binary
+
+  /logger/interval:
+    get:
+      operationId: getLoggerInterval
+      tags: [logger]
+      summary: Get current logger sampling interval
+      responses:
+        "200":
+          description: Current interval setting
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoggerSettings"
+    post:
+      operationId: setLoggerInterval
+      tags: [logger]
+      summary: Set logger sampling interval
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SetIntervalBody"
+      responses:
+        "200":
+          description: Interval updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoggerSettings"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +220,143 @@ components:
       required:
         - status
 
+    SensorMeta:
+      type: object
+      properties:
+        id:
+          type: string
+        displayName:
+          type: string
+        csvFile:
+          type: string
+        description:
+          type: string
+        parameterCount:
+          type: integer
+        color:
+          type: string
+      required:
+        - id
+        - displayName
+        - csvFile
+        - description
+        - parameterCount
+        - color
+
+    SensorSummary:
+      type: object
+      properties:
+        id:
+          type: string
+        displayName:
+          type: string
+        description:
+          type: string
+        color:
+          type: string
+        latestTimestamp:
+          type: string
+        parameterCount:
+          type: integer
+        mainParameter:
+          type: string
+        mainValue:
+          type: string
+        mainUnit:
+          type: string
+        rowCount:
+          type: integer
+      required:
+        - id
+        - displayName
+        - description
+        - color
+        - latestTimestamp
+        - parameterCount
+        - mainParameter
+        - mainValue
+        - mainUnit
+        - rowCount
+
+    SensorReading:
+      type: object
+      properties:
+        timestamp:
+          type: string
+        data:
+          type: object
+          additionalProperties: true
+      required:
+        - timestamp
+        - data
+
+    SensorDataResponse:
+      type: object
+      properties:
+        sensorId:
+          type: string
+        total:
+          type: integer
+        rows:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+      required:
+        - sensorId
+        - total
+        - rows
+
+    ParameterMeta:
+      type: object
+      properties:
+        key:
+          type: string
+        label:
+          type: string
+        unit:
+          type: string
+        category:
+          type: string
+        iconType:
+          type: string
+      required:
+        - key
+        - label
+        - unit
+        - category
+        - iconType
+
+    LoggerSettings:
+      type: object
+      properties:
+        intervalLabel:
+          type: string
+        intervalCode:
+          type: string
+        updatedAt:
+          type: string
+        message:
+          type: string
+      required:
+        - intervalLabel
+        - intervalCode
+
+    SetIntervalBody:
+      type: object
+      properties:
+        intervalLabel:
+          type: string
+        intervalCode:
+          type: string
+      required:
+        - intervalLabel
+        - intervalCode
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
