@@ -80,9 +80,9 @@ export function Login() {
             {/* Company logo */}
             <div className="flex justify-center">
               <img
-                src="/company-logo.svg"
-                alt="Company Logo"
-                className="h-12 object-contain drop-shadow-md"
+                src="/company-logo.png"
+                alt="iLab Marine"
+                className="h-20 object-contain drop-shadow-lg"
                 onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
               />
             </div>

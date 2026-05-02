@@ -21,11 +21,11 @@ export function Header({ onMenuClick }: { onMenuClick: () => void }) {
       }}
     >
       {/* LEFT: SQU Logo */}
-      <div className="flex items-center gap-3 w-36 flex-shrink-0">
+      <div className="flex items-center gap-2 w-40 flex-shrink-0">
         <img
-          src="/squ-logo.svg"
+          src="/squ-logo.png"
           alt="SQU"
-          className="h-12 w-12 rounded-full object-cover drop-shadow-md flex-shrink-0"
+          className="h-14 w-14 object-contain drop-shadow-md flex-shrink-0"
           onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
         />
         <span className="hidden xl:block text-xs text-white/70 leading-tight font-medium">Sultan Qaboos<br />University</span>
@@ -53,9 +53,9 @@ export function Header({ onMenuClick }: { onMenuClick: () => void }) {
         </div>
 
         <img
-          src="/company-logo.svg"
+          src="/company-logo.png"
           alt="iLab Marine"
-          className="h-10 object-contain drop-shadow-md flex-shrink-0 hidden sm:block"
+          className="h-14 object-contain drop-shadow-md flex-shrink-0 hidden sm:block"
           onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
         />
 

@@ -123,9 +123,9 @@ export function Home() {
         <div className="relative z-10 flex flex-col items-center text-center gap-4">
           <div className="flex items-center gap-3">
             <img
-              src="/squ-logo.svg"
+              src="/squ-logo.png"
               alt="SQU"
-              className="h-14 w-14 rounded-full object-cover drop-shadow-lg flex-shrink-0"
+              className="h-16 w-16 object-contain drop-shadow-lg flex-shrink-0"
               onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
             />
             <div>

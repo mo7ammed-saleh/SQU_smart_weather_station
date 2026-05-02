@@ -41,9 +41,9 @@ export function Sidebar({ mobileOpen, setMobileOpen }: { mobileOpen: boolean; se
         >
           <div className="flex items-center gap-2">
             <img
-              src="/squ-logo.svg"
+              src="/squ-logo.png"
               alt="SQU"
-              className="h-9 w-9 rounded-full object-cover flex-shrink-0"
+              className="h-10 w-10 object-contain flex-shrink-0"
               onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
             />
             <span className="text-white font-semibold text-sm leading-tight">
