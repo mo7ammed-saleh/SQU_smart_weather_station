@@ -75,42 +75,39 @@ export function Login() {
         transition={{ duration: 0.55 }}
         className="w-full max-w-md px-4 relative z-10"
       >
-        <Card className="border-white/20 shadow-2xl bg-white/10 backdrop-blur-xl">
-          <CardHeader className="space-y-5 items-center text-center pb-6 pt-8">
+        {/* White card */}
+        <Card className="border-0 shadow-2xl bg-white">
+          <CardHeader className="space-y-4 items-center text-center pb-4 pt-8">
             {/* Company logo */}
             <div className="flex justify-center">
               <img
                 src="/company-logo.png"
                 alt="iLab Marine"
-                className="h-20 object-contain drop-shadow-lg"
+                className="h-20 object-contain"
                 onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
               />
             </div>
 
             {/* Colorful gradient icon */}
             <div
-              className="h-16 w-16 rounded-2xl flex items-center justify-center shadow-lg"
+              className="h-14 w-14 rounded-2xl flex items-center justify-center shadow-lg"
               style={{
                 background: "linear-gradient(135deg, #0ea5e9, #06b6d4, #10b981)",
-                boxShadow: "0 8px 32px rgba(14,165,233,0.5)",
+                boxShadow: "0 8px 24px rgba(14,165,233,0.4)",
               }}
             >
-              <Activity className="h-8 w-8 text-white drop-shadow" />
+              <Activity className="h-7 w-7 text-white drop-shadow" />
             </div>
 
-            <div className="space-y-1.5">
-              <h1 className="text-xl font-bold tracking-tight text-white leading-snug">
+            <div className="space-y-1">
+              <h1 className="text-xl font-bold tracking-tight text-gray-800 leading-snug">
                 Smart Weather Station
-                <br />
-                <span className="text-base font-semibold text-cyan-200">Dashboard Login</span>
               </h1>
-              <p className="text-sm text-white/70">
-                Sultan Qaboos University — iLab Marine
-              </p>
+              <p className="text-base font-semibold text-primary">Dashboard Login</p>
             </div>
           </CardHeader>
 
-          <CardContent className="pb-8">
+          <CardContent className="pb-8 px-8">
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                 <FormField
@@ -118,19 +115,19 @@ export function Login() {
                   name="username"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-white/80 font-medium">Username</FormLabel>
+                      <FormLabel className="text-gray-600 font-medium">Username</FormLabel>
                       <FormControl>
                         <div className="relative">
-                          <User className="absolute left-3 top-3 h-4 w-4 text-white/50" />
+                          <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                           <Input
                             placeholder="Enter your username"
                             autoComplete="username"
-                            className="pl-10 bg-white/15 border-white/25 text-white placeholder:text-white/40 focus:bg-white/20 focus:border-cyan-300 transition-all"
+                            className="pl-10 bg-gray-50 border-gray-200 text-gray-800 placeholder:text-gray-400 focus:bg-white focus:border-primary transition-all"
                             {...field}
                           />
                         </div>
                       </FormControl>
-                      <FormMessage className="text-red-300" />
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -139,26 +136,26 @@ export function Login() {
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-white/80 font-medium">Password</FormLabel>
+                      <FormLabel className="text-gray-600 font-medium">Password</FormLabel>
                       <FormControl>
                         <div className="relative">
-                          <Lock className="absolute left-3 top-3 h-4 w-4 text-white/50" />
+                          <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                           <Input
                             type="password"
                             placeholder="Enter your password"
                             autoComplete="current-password"
-                            className="pl-10 bg-white/15 border-white/25 text-white placeholder:text-white/40 focus:bg-white/20 focus:border-cyan-300 transition-all"
+                            className="pl-10 bg-gray-50 border-gray-200 text-gray-800 placeholder:text-gray-400 focus:bg-white focus:border-primary transition-all"
                             {...field}
                           />
                         </div>
                       </FormControl>
-                      <FormMessage className="text-red-300" />
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
                 <Button
                   type="submit"
-                  className="w-full mt-2 h-11 text-base font-semibold shadow-lg transition-all hover:shadow-cyan-500/40 hover:scale-[1.01]"
+                  className="w-full mt-2 h-11 text-base font-semibold shadow-md transition-all hover:shadow-cyan-400/40 hover:scale-[1.01]"
                   style={{ background: "linear-gradient(90deg, #0ea5e9, #06b6d4)" }}
                   disabled={isLoading}
                 >
@@ -169,8 +166,8 @@ export function Login() {
           </CardContent>
         </Card>
 
-        <p className="mt-4 text-center text-xs text-white/40">
-          SQU Smart Weather Station Monitoring System © 2026
+        <p className="mt-4 text-center text-xs text-white/60">
+          Sultan Qaboos University — iLab Marine | © 2026
         </p>
       </motion.div>
     </div>

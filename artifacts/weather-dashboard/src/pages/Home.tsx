@@ -84,7 +84,7 @@ export function Home() {
       return;
     }
     setIntervalMutation.mutate(
-      { intervalLabel: found.label, intervalCode: found.code },
+      { data: { intervalLabel: found.label, intervalCode: found.code } },
       {
         onSuccess: () => {
           toast({ title: "Interval Updated", description: "Sampling interval saved. DT80W command integration can be connected later." });
@@ -121,27 +121,18 @@ export function Home() {
         <div className="absolute bottom-[-30%] left-[10%] w-40 h-40 rounded-full bg-sky-300/10 blur-3xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col items-center text-center gap-4">
-          <div className="flex items-center gap-3">
-            <img
-              src="/squ-logo.png"
-              alt="SQU"
-              className="h-16 w-16 object-contain drop-shadow-lg flex-shrink-0"
-              onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-            />
-            <div>
-              <h1 className="text-2xl font-bold text-white tracking-wide leading-tight">
-                Sultan Qaboos University
-              </h1>
-              <p className="text-cyan-200 text-sm font-medium">Weather Station Dashboard</p>
-            </div>
+          <div>
+            <h1 className="text-2xl font-bold text-white tracking-wide leading-tight">
+              Smart Weather Station
+            </h1>
+            <p className="text-cyan-200 text-sm font-medium mt-1">Environmental Monitoring Dashboard</p>
           </div>
 
           <div className="max-w-2xl">
-            <p className="text-white/80 text-sm leading-relaxed">
-              This dashboard monitors environmental and air quality data collected from multiple
-              sensors connected to the <span className="text-cyan-200 font-semibold">DataTaker DT80W</span> data logger.
-              The system converts logged DBD files into CSV files and displays readings, trends,
-              and downloadable reports.
+            <p className="text-white/85 text-sm leading-relaxed">
+              This dashboard provides a clear overview of environmental and air quality readings
+              from the Smart Weather Station. Users can monitor sensor records, view trends,
+              filter data by date and time, and download Excel reports for analysis.
             </p>
           </div>
 

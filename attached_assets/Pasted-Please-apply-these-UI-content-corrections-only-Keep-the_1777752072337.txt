@@ -1,0 +1,94 @@
+Please apply these UI/content corrections only. Keep the current functionality and layout structure.
+
+LOGIN PAGE
+1. Make the login panel/card white or very light, not dark/transparent blue, so the logo can appear clearly.
+2. Keep the blue animated background behind the login card.
+3. Replace the login title text with:
+Smart Weather Station Dashboard Login
+4. Remove this text from the login page:
+Sultan Qaboos University — iLab Marine
+5. Replace the login footer text:
+SQU Smart Weather Station Monitoring System © 2026
+with:
+Sultan Qaboos University — iLab Marine | © 2026
+6. Keep the colorful top icon, but make sure it looks clear on the white login card.
+7. Keep company logo support on the login card using:
+frontend/public/company-logo.png
+
+HOME PAGE / MAIN HEADER
+1. In the top main header, keep the two logos only:
+- SQU logo on the left
+- Company/iLab Marine logo on the right
+
+2. Remove this text from the header:
+Sultan Qaboos University
+
+3. Keep the main title:
+Smart Weather Station
+
+4. Put the current time in the center under the main title.
+5. Put System Online directly under the time.
+6. Keep the header blue and animated, but make it clean and easy for the eyes.
+
+LEFT SIDEBAR / NAVIGATION
+1. In the sidebar top area, remove the SQU logo and the text:
+Smart Weather
+
+2. Replace that area with a centered title:
+Navigation
+
+3. Keep the sidebar on the left side.
+
+4. Move the Logout button to the bottom of the sidebar/navigation panel, not in the top header.
+5. Style the logout button clearly but not aggressively.
+
+HOME HERO / DESCRIPTION CARD
+1. In the large home description/hero card:
+- Remove the SQU logo/icon from inside the description card.
+- Remove the text:
+Sultan Qaboos University
+
+2. Keep the 3 pill buttons:
+- 4 Active Sensors
+- Live CSV Data
+- Excel Export
+They are perfect.
+
+3. Replace the technical description with a simpler non-technical description:
+
+This dashboard provides a clear overview of environmental and air quality readings from the Smart Weather Station. Users can monitor sensor records, view trends, filter data by date and time, and download Excel reports for analysis.
+
+4. Make the description centered and visually clean.
+5. Keep the blue/cyan glass style.
+
+HOME SENSOR CARDS
+Keep the current sensor cards style.
+They should show:
+- Last Record
+- Parameters
+- Records
+- Status
+- View Details
+
+Do not show the main reading value on the home sensor cards.
+
+FOOTER
+1. Keep the footer blue and professional.
+2. Center text:
+SQU Smart Weather Station Monitoring System © 2026 | Developed for environmental data monitoring
+3. On the right side show:
+iLab Marine
+
+DATA IMPORTANT
+Do not change the data logic in this request.
+Do not generate extra CSV rows.
+Use only the existing CSV files as the data source.
+Do not overwrite my CSV files.
+
+After editing, test:
+- Login page appearance
+- Home page header
+- Sidebar position and logout placement
+- Home hero description
+- Footer
+- No broken routes or TypeScript errors
