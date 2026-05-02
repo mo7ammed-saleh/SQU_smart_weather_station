@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "tB3E6Aoj3yWzAFBCROrdT"
+uri = "file://squ-weather-dashboard.zip"
+type = "unspecified"
+title = "SQU Weather Dashboard — Full Source Code"
