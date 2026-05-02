@@ -43,9 +43,7 @@ const SENSOR_COLORS: Record<string, string> = {
 function formatTs(iso: string) {
   try {
     const d = new Date(iso);
-    return d.toLocaleString("en-GB", {
-      day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit"
-    });
+    return d.toLocaleString("en-GB", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" });
   } catch { return iso; }
 }
 
@@ -53,19 +51,20 @@ function formatFull(iso: string) {
   try {
     return new Date(iso).toLocaleString("en-GB", {
       day: "2-digit", month: "short", year: "numeric",
-      hour: "2-digit", minute: "2-digit", second: "2-digit"
+      hour: "2-digit", minute: "2-digit", second: "2-digit",
     });
   } catch { return iso; }
 }
 
-const container = {
-  hidden: { opacity: 0 },
-  show: { opacity: 1, transition: { staggerChildren: 0.06 } },
-};
-const item = {
-  hidden: { opacity: 0, y: 16 },
-  show: { opacity: 1, y: 0 },
-};
+/** Downsample array to at most `maxPoints` evenly spread items for chart display */
+function downsample<T>(arr: T[], maxPoints: number): T[] {
+  if (arr.length <= maxPoints) return arr;
+  const step = arr.length / maxPoints;
+  return Array.from({ length: maxPoints }, (_, i) => arr[Math.round(i * step)]);
+}
+
+const container = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.06 } } };
+const item = { hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0 } };
 
 const ROWS_PER_PAGE = 20;
 
@@ -90,7 +89,6 @@ export function SensorPage({ sensorId }: { sensorId: string }) {
   const queryParams = useMemo(() => ({
     from: appliedFrom || undefined,
     to: appliedTo || undefined,
-    limit: 500,
   }), [appliedFrom, appliedTo]);
 
   const { data: sensorData, isLoading: loadingData } = useGetSensorData(
@@ -101,32 +99,25 @@ export function SensorPage({ sensorId }: { sensorId: string }) {
 
   const activeParam = selectedParam || (parameters?.[0]?.key ?? "");
 
+  const allRows = sensorData?.rows ?? [];
+
   const chartData = useMemo(() => {
-    if (!sensorData?.rows || !activeParam) return [];
-    return sensorData.rows.map((row) => ({
+    if (!allRows.length || !activeParam) return [];
+    const mapped = allRows.map((row) => ({
       ts: formatTs(String(row["timestamp"])),
       value: typeof row[activeParam] === "number" ? row[activeParam] : parseFloat(String(row[activeParam])),
     }));
-  }, [sensorData, activeParam]);
+    return downsample(mapped, 500);
+  }, [allRows, activeParam]);
 
-  const tableRows = sensorData?.rows ?? [];
-  const totalPages = Math.ceil(tableRows.length / ROWS_PER_PAGE);
-  const pageRows = tableRows.slice(page * ROWS_PER_PAGE, (page + 1) * ROWS_PER_PAGE);
+  const totalPages = Math.ceil(allRows.length / ROWS_PER_PAGE);
+  const pageRows = allRows.slice(page * ROWS_PER_PAGE, (page + 1) * ROWS_PER_PAGE);
   const tableColumns = parameters
     ? ["timestamp", ...parameters.map((p) => p.key)]
-    : tableRows.length > 0
-      ? Object.keys(tableRows[0])
-      : [];
+    : allRows.length > 0 ? Object.keys(allRows[0]) : [];
 
-  function applyFilter() {
-    setAppliedFrom(from);
-    setAppliedTo(to);
-    setPage(0);
-  }
-
-  function resetFilter() {
-    setFrom(""); setTo(""); setAppliedFrom(""); setAppliedTo(""); setPage(0);
-  }
+  function applyFilter() { setAppliedFrom(from); setAppliedTo(to); setPage(0); }
+  function resetFilter() { setFrom(""); setTo(""); setAppliedFrom(""); setAppliedTo(""); setPage(0); }
 
   function handleExport() {
     const p = new URLSearchParams({ sensor: sensorId });
@@ -135,56 +126,35 @@ export function SensorPage({ sensorId }: { sensorId: string }) {
     window.open(`/api/export/excel?${p.toString()}`, "_blank");
   }
 
-  const sensorLabel = sensorId.toUpperCase().replace("SMP10", "SMP10").replace("DR30", "DR30");
-
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.4 }}
-      className="space-y-6"
-    >
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }} className="space-y-6">
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-bold text-foreground">
-            Parameters — {sensorId.toUpperCase()}_DATA
-          </h1>
+          <h1 className="text-xl font-bold text-foreground">{sensorId.toUpperCase()}_DATA — Parameters</h1>
           <p className="text-sm text-muted-foreground mt-0.5">
-            {sensorData ? `${sensorData.total.toLocaleString()} records` : "Loading..."}
-            {(appliedFrom || appliedTo) && " · filtered"}
+            {loadingData
+              ? "Loading..."
+              : `${(sensorData?.total ?? 0).toLocaleString()} records${(appliedFrom || appliedTo) ? " · filtered" : " · all CSV data"}`}
           </p>
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handleExport}
-          className="self-start"
-          data-testid="btn-export-sensor"
-        >
-          <Download className="h-4 w-4 mr-2" />
-          Export Excel
+        <Button variant="outline" size="sm" onClick={handleExport} className="self-start">
+          <Download className="h-4 w-4 mr-2" /> Export Excel
         </Button>
       </div>
 
       {/* Latest Reading Cards */}
       <div>
-        <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
-          Latest Readings
-        </h2>
+        <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">Latest Readings</h2>
         <motion.div
-          variants={container}
-          initial="hidden"
-          animate="show"
+          variants={container} initial="hidden" animate="show"
           className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-3"
         >
           {(loadingLatest || loadingParams)
             ? Array(6).fill(0).map((_, i) => (
                 <Card key={i} className="border-border">
                   <CardContent className="p-4 space-y-2">
-                    <Skeleton className="h-4 w-24" />
-                    <Skeleton className="h-6 w-16" />
-                    <Skeleton className="h-3 w-20" />
+                    <Skeleton className="h-4 w-24" /><Skeleton className="h-6 w-16" /><Skeleton className="h-3 w-20" />
                   </CardContent>
                 </Card>
               ))
@@ -196,28 +166,19 @@ export function SensorPage({ sensorId }: { sensorId: string }) {
                   : "--";
                 return (
                   <motion.div key={param.key} variants={item}>
-                    <Card
-                      className="border-border hover:shadow-sm hover:-translate-y-0.5 transition-all duration-150"
-                      data-testid={`card-param-${param.key.replace(/\s/g,"-").replace(/[^a-z0-9-]/gi,"")}`}
-                    >
+                    <Card className="border-border hover:shadow-sm hover:-translate-y-0.5 transition-all duration-150">
                       <CardContent className="p-4">
-                        <div
-                          className="h-8 w-8 rounded-lg flex items-center justify-center mb-2"
-                          style={{ backgroundColor: `${color}18`, color }}
-                        >
+                        <div className="h-8 w-8 rounded-lg flex items-center justify-center mb-2"
+                          style={{ backgroundColor: `${color}18`, color }}>
                           <Icon className="h-4 w-4" />
                         </div>
                         <div className="text-lg font-bold text-foreground leading-tight">
                           {displayVal}
-                          {param.unit && (
-                            <span className="text-xs font-normal text-muted-foreground ml-1">{param.unit}</span>
-                          )}
+                          {param.unit && <span className="text-xs font-normal text-muted-foreground ml-1">{param.unit}</span>}
                         </div>
                         <div className="text-xs text-muted-foreground mt-1 leading-tight line-clamp-2">{param.label}</div>
                         {latest?.timestamp && (
-                          <div className="text-[10px] text-muted-foreground/70 mt-1">
-                            {formatFull(latest.timestamp)}
-                          </div>
+                          <div className="text-[10px] text-muted-foreground/60 mt-1">{formatFull(latest.timestamp)}</div>
                         )}
                       </CardContent>
                     </Card>
@@ -227,43 +188,28 @@ export function SensorPage({ sensorId }: { sensorId: string }) {
         </motion.div>
       </div>
 
-      {/* Filters */}
+      {/* Date Filter */}
       <Card className="border-border">
         <CardContent className="p-4">
           <div className="flex flex-wrap items-end gap-3">
             <div className="flex items-center gap-2 text-sm font-medium text-foreground">
-              <Filter className="h-4 w-4 text-primary" />
-              Filter by date range
+              <Filter className="h-4 w-4 text-primary" /> Filter by date range
             </div>
             <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-3 min-w-0">
               <div>
                 <label className="text-xs text-muted-foreground font-medium block mb-1">From</label>
-                <input
-                  type="datetime-local"
-                  className="w-full text-sm border border-input rounded-md px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-ring"
-                  value={from}
-                  onChange={(e) => setFrom(e.target.value)}
-                  data-testid="input-filter-from"
-                />
+                <input type="datetime-local" className="w-full text-sm border border-input rounded-md px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-ring"
+                  value={from} onChange={(e) => setFrom(e.target.value)} />
               </div>
               <div>
                 <label className="text-xs text-muted-foreground font-medium block mb-1">To</label>
-                <input
-                  type="datetime-local"
-                  className="w-full text-sm border border-input rounded-md px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-ring"
-                  value={to}
-                  onChange={(e) => setTo(e.target.value)}
-                  data-testid="input-filter-to"
-                />
+                <input type="datetime-local" className="w-full text-sm border border-input rounded-md px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-ring"
+                  value={to} onChange={(e) => setTo(e.target.value)} />
               </div>
             </div>
             <div className="flex gap-2">
-              <Button size="sm" onClick={applyFilter} data-testid="btn-apply-filter">
-                <Filter className="h-4 w-4 mr-1" /> Apply
-              </Button>
-              <Button size="sm" variant="outline" onClick={resetFilter} data-testid="btn-reset-filter">
-                <RotateCcw className="h-4 w-4 mr-1" /> Reset
-              </Button>
+              <Button size="sm" onClick={applyFilter}><Filter className="h-4 w-4 mr-1" /> Apply</Button>
+              <Button size="sm" variant="outline" onClick={resetFilter}><RotateCcw className="h-4 w-4 mr-1" /> Reset</Button>
             </div>
           </div>
         </CardContent>
@@ -274,18 +220,18 @@ export function SensorPage({ sensorId }: { sensorId: string }) {
         <CardHeader className="pb-3">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <CardTitle className="text-base flex items-center gap-2">
-              <TrendingUp className="h-4 w-4 text-primary" />
-              Parameter Chart
+              <TrendingUp className="h-4 w-4 text-primary" /> Parameter Chart
+              {allRows.length > 500 && (
+                <span className="text-xs font-normal text-muted-foreground ml-1">(showing up to 500 points)</span>
+              )}
             </CardTitle>
             <Select value={activeParam} onValueChange={setSelectedParam}>
-              <SelectTrigger className="w-full sm:w-72 bg-white" data-testid="select-chart-param">
+              <SelectTrigger className="w-full sm:w-72 bg-white">
                 <SelectValue placeholder="Select parameter..." />
               </SelectTrigger>
               <SelectContent>
                 {(parameters ?? []).map((p) => (
-                  <SelectItem key={p.key} value={p.key}>
-                    {p.label}{p.unit ? ` (${p.unit})` : ""}
-                  </SelectItem>
+                  <SelectItem key={p.key} value={p.key}>{p.label}{p.unit ? ` (${p.unit})` : ""}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -302,31 +248,14 @@ export function SensorPage({ sensorId }: { sensorId: string }) {
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={chartData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                <XAxis
-                  dataKey="ts"
-                  tick={{ fontSize: 11, fill: "#64748b" }}
-                  interval={Math.floor(chartData.length / 8)}
-                  tickLine={false}
-                />
+                <XAxis dataKey="ts" tick={{ fontSize: 11, fill: "#64748b" }} interval={Math.floor(chartData.length / 8)} tickLine={false} />
                 <YAxis tick={{ fontSize: 11, fill: "#64748b" }} tickLine={false} axisLine={false} />
-                <Tooltip
-                  contentStyle={{
-                    background: "rgba(255,255,255,0.95)",
-                    border: "1px solid #e2e8f0",
-                    borderRadius: 8,
-                    fontSize: 12,
-                  }}
-                />
+                <Tooltip contentStyle={{ background: "rgba(255,255,255,0.95)", border: "1px solid #e2e8f0", borderRadius: 8, fontSize: 12 }} />
                 <Legend wrapperStyle={{ fontSize: 12 }} />
                 <Line
-                  type="monotone"
-                  dataKey="value"
+                  type="monotone" dataKey="value"
                   name={parameters?.find((p) => p.key === activeParam)?.label ?? activeParam}
-                  stroke={color}
-                  strokeWidth={2}
-                  dot={false}
-                  activeDot={{ r: 4 }}
-                  isAnimationActive
+                  stroke={color} strokeWidth={2} dot={false} activeDot={{ r: 4 }} isAnimationActive
                 />
               </LineChart>
             </ResponsiveContainer>
@@ -338,39 +267,31 @@ export function SensorPage({ sensorId }: { sensorId: string }) {
       <Card className="border-border">
         <CardHeader className="pb-3">
           <CardTitle className="text-base flex items-center justify-between">
-            <span className="flex items-center gap-2">
-              <TableIcon className="h-4 w-4 text-primary" />
-              Data Table
-            </span>
+            <span className="flex items-center gap-2"><TableIcon className="h-4 w-4 text-primary" /> Data Table</span>
             {sensorData && (
               <span className="text-xs font-normal text-muted-foreground">
-                {sensorData.total.toLocaleString()} rows
+                {sensorData.total.toLocaleString()} rows from CSV
               </span>
             )}
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
           {loadingData ? (
-            <div className="p-6 space-y-3">
-              {Array(5).fill(0).map((_, i) => <Skeleton key={i} className="h-8 w-full" />)}
-            </div>
-          ) : tableRows.length === 0 ? (
+            <div className="p-6 space-y-3">{Array(5).fill(0).map((_, i) => <Skeleton key={i} className="h-8 w-full" />)}</div>
+          ) : allRows.length === 0 ? (
             <div className="p-8 text-center text-muted-foreground text-sm">No data available.</div>
           ) : (
             <>
               <div className="overflow-x-auto">
-                <table className="w-full text-xs" data-testid="data-table">
+                <table className="w-full text-xs">
                   <thead>
                     <tr className="border-b border-border bg-muted/40">
                       {tableColumns.map((col) => {
                         const meta = parameters?.find((p) => p.key === col);
                         return (
-                          <th
-                            key={col}
-                            className="px-3 py-2.5 text-left font-semibold text-muted-foreground whitespace-nowrap"
-                          >
+                          <th key={col} className="px-3 py-2.5 text-left font-semibold text-muted-foreground whitespace-nowrap">
                             {meta ? meta.label : col === "timestamp" ? "Timestamp" : col}
-                            {meta?.unit && <span className="font-normal ml-1 opacity-70">({meta.unit})</span>}
+                            {meta?.unit && <span className="font-normal ml-1 opacity-60">({meta.unit})</span>}
                           </th>
                         );
                       })}
@@ -378,15 +299,10 @@ export function SensorPage({ sensorId }: { sensorId: string }) {
                   </thead>
                   <tbody>
                     {pageRows.map((row, i) => (
-                      <tr
-                        key={i}
-                        className="border-b border-border/50 hover:bg-muted/30 transition-colors"
-                      >
+                      <tr key={i} className="border-b border-border/50 hover:bg-muted/30 transition-colors">
                         {tableColumns.map((col) => (
                           <td key={col} className="px-3 py-2 whitespace-nowrap text-foreground/80 font-mono">
-                            {col === "timestamp"
-                              ? formatFull(String(row[col]))
-                              : String(row[col] ?? "")}
+                            {col === "timestamp" ? formatFull(String(row[col])) : String(row[col] ?? "")}
                           </td>
                         ))}
                       </tr>
@@ -394,31 +310,14 @@ export function SensorPage({ sensorId }: { sensorId: string }) {
                   </tbody>
                 </table>
               </div>
-              {/* Pagination */}
               {totalPages > 1 && (
                 <div className="flex items-center justify-between px-4 py-3 border-t border-border bg-muted/20">
                   <span className="text-xs text-muted-foreground">
-                    Page {page + 1} of {totalPages} · {tableRows.length.toLocaleString()} rows
+                    Page {page + 1} of {totalPages} · {allRows.length.toLocaleString()} total rows
                   </span>
                   <div className="flex gap-2">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      disabled={page === 0}
-                      onClick={() => setPage((p) => Math.max(0, p - 1))}
-                      data-testid="btn-prev-page"
-                    >
-                      Previous
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      disabled={page >= totalPages - 1}
-                      onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
-                      data-testid="btn-next-page"
-                    >
-                      Next
-                    </Button>
+                    <Button size="sm" variant="outline" disabled={page === 0} onClick={() => setPage((p) => Math.max(0, p - 1))}>Previous</Button>
+                    <Button size="sm" variant="outline" disabled={page >= totalPages - 1} onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}>Next</Button>
                   </div>
                 </div>
               )}

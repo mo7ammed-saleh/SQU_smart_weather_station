@@ -84,7 +84,7 @@ router.get("/:sensorId/data", (req: Request, res: Response) => {
   }
 
   const { from, to, limit } = req.query as Record<string, string>;
-  const maxRows = limit ? parseInt(limit, 10) : 500;
+  const maxRows = limit ? parseInt(limit, 10) : 0;
 
   try {
     const rows = readCsv(sensor.csvFile);
