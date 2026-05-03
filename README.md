@@ -8,7 +8,7 @@ A full-stack environmental monitoring dashboard for the SQU Smart Weather Statio
 
 To replace the CSV data with new sensor readings:
 
-1. Replace the CSV files inside `artifacts/api-server/data/csv/`
+1. Replace the CSV files inside `DB/CSV_Files/`
 2. Keep the same file names: `AQT560_DATA.CSV`, `WS500_DATA.CSV`, `SMP10_DATA.CSV`, `DR30_DATA.CSV`
 3. Restart the API Server workflow
 4. Refresh the dashboard — all row counts, charts, and tables update automatically
@@ -74,14 +74,38 @@ setup-production.md       → Production deployment
 
 ## CSV Data
 
-Place real sensor CSV files in `artifacts/api-server/data/csv/`:
+Place real sensor CSV files in `DB/CSV_Files/` (project root):
 
 - `AQT560_DATA.CSV`
 - `WS500_DATA.CSV`
 - `SMP10_DATA.CSV`
 - `DR30_DATA.CSV`
 
+The backend reads from this folder on every request. Replacing files and refreshing the dashboard shows new data immediately. The folder path can be overridden with the `CSV_DATA_DIR` environment variable (resolved relative to the project root).
+
 **Do not generate or simulate CSV rows. Use only real sensor data.**
+
+---
+
+## Publishing to GitHub
+
+To push the dashboard code to GitHub:
+
+1. Create a GitHub Personal Access Token:
+   - Go to **https://github.com/settings/tokens**
+   - Click **"Generate new token (classic)"**
+   - Select the **`repo`** scope
+   - Copy the token (starts with `ghp_`)
+   - **For fine-grained tokens**: go to Settings → Tokens → edit the token → add the target repository under "Repository access" → set **Contents: Read and write**
+
+2. Store the token as a Replit Secret named **`GITHUB_TOKEN`**
+
+3. Run the publish script:
+   ```bash
+   bash scripts/publish-to-github.sh https://github.com/YOUR_USERNAME/YOUR_REPO.git
+   ```
+
+The `GITHUB_TOKEN` secret is never committed to the repository.
 
 ---
 
