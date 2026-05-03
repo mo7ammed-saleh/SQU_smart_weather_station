@@ -1,6 +1,6 @@
 # SQU Smart Weather Station Dashboard
 
-**Sultan Qaboos University — iLab Marine- Developed by Mohammed Saleh- +96894776969**
+**Sultan Qaboos University — iLab Marine- Developed by Mohammed Saleh +96894776969**
 
 A full-stack dashboard for monitoring the SQU Smart Weather Station. The system uses a React/Vite frontend and an Express/Node.js backend. The dashboard reads real sensor CSV files, displays latest readings, charts, data tables, date filters, and exports Excel reports.
 
