@@ -1,82 +1,120 @@
-# 08 — DT80W Data Flow (Future Integration)
+# 08 — DT80W Data Flow
 
-## Current Flow
+## Final Data Pipeline
 
-```
-CSV files → API Server → Dashboard
-```
-
-The dashboard currently reads pre-existing CSV files. These files were converted manually from the DataTaker DT80W logger.
-
-## Full Intended Flow
-
-```
-DT80W Logger
-    │  (logs sensor readings every N minutes as .DBD files)
-    ▼
-FTP Server on DT80W
-    │  (Python script downloads .DBD file via FTP)
-    ▼
-dump_dbd Tool
-    │  (converts .DBD binary format to .CSV)
-    ▼
-CSV files in data/csv/
-    │  (API server reads these files)
-    ▼
-Dashboard
+```text
+DT80W Data Logger
+  ↓ records sensor readings as DBD files
+Python FTP script
+  ↓ downloads DBD files from the logger
+Python plus dump_dbd.exe
+  ↓ converts DBD files to CSV
+DB/CSV_Files/
+  ↓ Express API reads the CSV files
+Smart Weather Station Dashboard
 ```
 
-## Step-by-Step
+The dashboard does not read DBD files directly. Python is responsible for DBD download and CSV conversion. The dashboard reads only the final CSV files.
 
-1. **DT80W Logger** records environmental sensor readings at the configured interval (e.g., every 15 minutes). Readings are stored internally as `.DBD` (DataTaker Binary Data) files.
+## DT80W Logging Program
 
-2. **Python FTP Script** connects to the DT80W's built-in FTP server and downloads the latest `.DBD` file. This script can be scheduled via Windows Task Scheduler or cron.
+The DT80W logger records four schedules:
 
-3. **dump_dbd Tool** is a command-line utility that converts `.DBD` files to `.CSV` format. It preserves all channel names and timestamps.
-
-4. **CSV File Replacement** — The output CSV is placed in `artifacts/api-server/data/csv/`. The filename must match the expected name (e.g., `AQT560_DATA.CSV`).
-
-5. **Dashboard Auto-refresh** — The API server reads CSV files fresh on each request. Once the CSV is updated, the dashboard reflects the new data on the next page load or data refresh.
-
-## Logger Interval Control
-
-The Settings → Logger Interval control on the Home page currently saves the interval to `data/logger-settings.json`. 
-
-In the future, this can be connected to send a configuration command directly to the DT80W via its TCP command interface:
-```
-SCHEDULE 1B 1= EVERY 30M
+```text
+RA"AQT560_DATA"<INTERVAL>
+RB"WS500_DATA"<INTERVAL>
+RC"SMP10_DATA"<INTERVAL>
+RD"DR30_DATA"<INTERVAL>
 ```
 
-## Last CSV Update vs. Last Sensor Reading
+The interval can be 15M, 30M, 45M, 1H, 2H, 3H, 4H, or 1D.
 
-The dashboard shows two different timestamps for each sensor:
+## Python DBD-to-CSV Updater
+
+The Python updater should:
+
+1. Connect to the DT80W FTP server.
+2. Download the DBD files.
+3. Convert DBD files to CSV using `dump_dbd.exe`.
+4. Save or replace the CSV files in `DB/CSV_Files/`.
+5. A batch file can run the Python script.
+6. Windows Task Scheduler can run the batch file automatically, for example every 30 minutes.
+7. Refreshing the dashboard shows the latest CSV data.
+
+Required output files:
+
+```text
+AQT560_DATA.CSV
+WS500_DATA.CSV
+SMP10_DATA.CSV
+DR30_DATA.CSV
+```
+
+## Dashboard CSV Reading
+
+The Express API reads CSV data from:
+
+```text
+DB/CSV_Files/
+```
+
+The dashboard uses CSV files for home sensor cards, latest readings, tables, charts, filters, Excel export, Last Record, and Last CSV Update.
+
+CSV files are the source of truth. Do not generate fake rows.
+
+## Last CSV Update vs Last Record
 
 | Field | Meaning |
-|-------|---------|
-| **Last Record** | Timestamp of the most recent row inside the CSV file (sensor measurement time) |
-| **Last CSV Update** | File system `mtime` of the CSV file — when the file was last written to disk |
+|---|---|
+| Last CSV Update | File modified time. It shows when the CSV file was last written or replaced. |
+| Last Record | Newest timestamp inside the CSV file. It shows the newest sensor measurement. |
 
-These will differ when:
-- The CSV was replaced with a new export at a different time than the last measurement
-- A partial CSV was appended to (the mtime advances, but the newest sensor reading may be older)
-- File copy operations touch the mtime without changing the content
+Use Last CSV Update to confirm the Python pipeline has run. Use Last Record to confirm the sensor is logging new measurements.
 
-When monitoring the pipeline health, use **Last CSV Update** to confirm that the DT80W → dump_dbd → CSV pipeline has run recently. Use **Last Record** to confirm the sensor is still logging data.
+## DT80W Direct Interval Control
 
-If the CSV file is missing, Last CSV Update shows **Not available** — this is a signal the pipeline has not placed the file yet.
+The dashboard includes direct DT80W interval-control support.
 
-## Default Date Range on Sensor Pages
+Safe default:
 
-When a sensor detail page opens it defaults to **Last 2 days** relative to the latest timestamp in the CSV. This means:
-- If the CSV has recent data, the page shows the latest 48 hours automatically
-- The user can switch to Last 5 days, Last 1 week, Last 2 weeks, Last 3 weeks, Last 1 month, or Custom range
-- Both the chart and the data table always follow the selected range
-- The table status bar shows: `Showing N of M filtered rows | Total CSV rows: T | Range: Last 2 days`
+```env
+DT80_ENABLED=false
+DT80_MODE=dry-run
+```
 
-## Notes for Developers
+When the logger is physically connected and the command interface is confirmed:
 
-- Do not generate or simulate CSV rows
-- The timestamp format expected is: `"DD/MM/YYYY, HH:MM"` (quoted, seconds optional)
-- If a new sensor is added to the DT80W, a new CSV file and sensor config entry must be added
-- See `config/sensors.ts` in the API server to register a new sensor
-- When replacing CSV files, keep the exact same filenames — the app uses file names from `config/sensors.ts`
+```env
+DT80_ENABLED=true
+DT80_MODE=tcp
+DT80_IP=192.168.5.50
+DT80_PORT=7700
+```
+
+Workflow:
+
+1. User selects a logging interval.
+2. User clicks Test DT80W Connection.
+3. If the connection succeeds, user clicks Apply Interval to Logger.
+4. Backend sends the interval update to the logger.
+5. The selected interval is saved only after a successful apply.
+
+Safety rules:
+
+- Do not delete logger data.
+- Do not delete logger jobs.
+- Do not enable full job apply unless it is intentionally tested.
+
+## Sensor Status
+
+A future CSV status register can be added to each CSV file. If the CSV includes a status column such as `Sensor Status`, `Status Register`, `Device Status`, or `Status`, the dashboard can use it to show Active, Warning, Error, or Unknown.
+
+If no status column exists, the dashboard can fall back to CSV freshness and data availability.
+
+## Developer Notes
+
+- Keep CSV path as `DB/CSV_Files/`.
+- Keep CSV headers dynamic.
+- Keep Python updater separate from the dashboard app.
+- The dashboard should never create fake sensor rows.
+- GitHub Pages is not suitable because Express backend is required.
