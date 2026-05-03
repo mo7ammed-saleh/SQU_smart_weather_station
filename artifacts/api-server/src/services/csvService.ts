@@ -1,8 +1,13 @@
 import fs from "fs";
 import path from "path";
 import Papa from "papaparse";
+import { fileURLToPath } from "url";
 
-const PROJECT_ROOT = path.resolve(process.cwd(), "../..");
+// Derive project root from the bundled file location, regardless of startup cwd.
+// At runtime the bundle lives at: artifacts/api-server/dist/index.mjs
+// Three levels up from dist/ reaches the monorepo root.
+const __filename = fileURLToPath(import.meta.url);
+const PROJECT_ROOT = path.resolve(path.dirname(__filename), "../../..");
 const CSV_DIR = process.env.CSV_DATA_DIR
   ? path.resolve(PROJECT_ROOT, process.env.CSV_DATA_DIR)
   : path.resolve(PROJECT_ROOT, "DB/CSV_Files");

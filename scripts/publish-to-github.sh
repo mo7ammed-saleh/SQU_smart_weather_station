@@ -34,4 +34,8 @@ git remote set-url origin "$AUTH_URL"
 echo "Pushing to GitHub..."
 git push origin main
 
+# Remove token from local git config — never leave credentials in remote URL
+echo "Cleaning up credentials from remote config..."
+git remote set-url origin "$CLEAN_URL"
+
 echo "Done. Code is live at: $REPO_URL"
