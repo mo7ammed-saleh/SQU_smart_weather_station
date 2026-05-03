@@ -209,10 +209,6 @@ export function Home() {
                           <h3 className="font-bold text-sm leading-tight text-center mt-1.5" style={{ color: sensor.color }}>
                             {sensor.displayName}
                           </h3>
-                          <span className="flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full bg-green-50 text-green-700 border border-green-200 mt-1.5">
-                            <CheckCircle2 className="h-3 w-3" />
-                            Active
-                          </span>
                         </div>
 
                         <div className="space-y-1.5 text-xs">
@@ -240,7 +236,10 @@ export function Home() {
                           </div>
                           <div className="flex items-center justify-between">
                             <span className="text-muted-foreground">Status</span>
-                            <span className="font-medium text-green-600">Active</span>
+                            <span className="flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full bg-green-50 text-green-700 border border-green-200">
+                              <CheckCircle2 className="h-3 w-3" />
+                              Active
+                            </span>
                           </div>
                           <div className="flex items-start justify-between border-t border-border pt-1.5 mt-1 gap-2">
                             <span className="text-muted-foreground flex items-center gap-1 shrink-0">
