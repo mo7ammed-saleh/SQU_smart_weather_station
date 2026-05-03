@@ -123,7 +123,7 @@ export function Home() {
         <div className="relative z-10 flex flex-col items-center text-center gap-4">
           <div>
             <h1 className="text-2xl font-bold text-white tracking-wide leading-tight">
-              Smart Weather Station
+              Welcome to Smart Weather Station Dashboard
             </h1>
             <p className="text-cyan-200 text-sm font-medium mt-1">Environmental Monitoring Dashboard</p>
           </div>
