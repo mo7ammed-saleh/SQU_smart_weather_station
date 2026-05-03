@@ -2,9 +2,10 @@ import fs from "fs";
 import path from "path";
 import Papa from "papaparse";
 
+const PROJECT_ROOT = path.resolve(process.cwd(), "../..");
 const CSV_DIR = process.env.CSV_DATA_DIR
-  ? path.resolve(process.env.CSV_DATA_DIR)
-  : path.resolve(process.cwd(), "../../DB/CSV_Files");
+  ? path.resolve(PROJECT_ROOT, process.env.CSV_DATA_DIR)
+  : path.resolve(PROJECT_ROOT, "DB/CSV_Files");
 
 export interface CsvRow {
   timestamp: string;
