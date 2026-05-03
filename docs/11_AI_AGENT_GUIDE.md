@@ -18,7 +18,7 @@ This is a **full-stack environmental monitoring dashboard** for Sultan Qaboos Un
 ## Critical Rules
 
 ### 1. Never generate fake CSV data
-The CSV files contain real sensor measurements. Do not add, simulate, or generate any rows. Every row must come from the physical sensor.
+The CSV files contain real sensor measurements. Do not add, simulate, or generate any rows. Every row must come from the physical sensor. Do not generate sample rows unless the user explicitly requests it for isolated testing.
 
 ### 2. Never overwrite real CSV files
 The files in `artifacts/api-server/data/csv/` are the source of truth. If you need test data, use a copy. Never modify the originals.
@@ -37,6 +37,15 @@ The navigation sidebar is on the left side of the layout. Do not move it to the 
 
 ### 6. Login uses the API
 `POST /api/auth/login` validates against `data/users.json`. Do not revert to hardcoded credentials.
+
+### 7. Default sensor page range is Last 2 days
+When any sensor detail page loads, it defaults to showing only the last 2 days of data relative to the latest record in the CSV. The user can change this to Last 5 days, Last 1 week, Last 2 weeks, Last 3 weeks, Last 1 month, or Custom range. Chart and table both follow the selected range.
+
+### 8. csvTotal vs total in API responses
+The `/api/sensors/:id/data` endpoint returns both:
+- `total` — the number of rows returned after the date filter
+- `csvTotal` — the total row count in the CSV file regardless of any filter
+Both are shown in the data table status bar.
 
 ---
 

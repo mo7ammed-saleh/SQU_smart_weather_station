@@ -88,7 +88,10 @@ export const GetSensorDataQueryParams = zod.object({
 
 export const GetSensorDataResponse = zod.object({
   sensorId: zod.string(),
-  total: zod.number(),
+  total: zod.number().describe("Number of rows returned (after date filter)"),
+  csvTotal: zod
+    .number()
+    .describe("Total rows in the CSV file regardless of filter"),
   rows: zod.array(zod.record(zod.string(), zod.unknown())),
 });
 

@@ -301,6 +301,10 @@ components:
           type: string
         total:
           type: integer
+          description: "Number of rows returned (after date filter)"
+        csvTotal:
+          type: integer
+          description: "Total rows in the CSV file regardless of filter"
         rows:
           type: array
           items:
@@ -309,6 +313,7 @@ components:
       required:
         - sensorId
         - total
+        - csvTotal
         - rows
 
     ParameterMeta:

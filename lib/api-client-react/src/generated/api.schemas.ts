@@ -44,7 +44,10 @@ export type SensorDataResponseRowsItem = { [key: string]: unknown };
 
 export interface SensorDataResponse {
   sensorId: string;
+  /** Number of rows returned (after date filter) */
   total: number;
+  /** Total rows in the CSV file regardless of filter */
+  csvTotal: number;
   rows: SensorDataResponseRowsItem[];
 }
 

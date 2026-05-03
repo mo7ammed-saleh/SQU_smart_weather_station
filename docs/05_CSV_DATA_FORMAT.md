@@ -47,9 +47,12 @@ The dashboard displays the exact number of rows present in the CSV file. There i
 
 To update the dashboard with real data:
 1. Export the new CSV from the DataTaker DT80W or the Python conversion script
-2. Replace the corresponding `.CSV` file in `artifacts/api-server/data/csv/`
+2. Replace the corresponding `.CSV` file in `artifacts/api-server/data/csv/` — keep the exact same filename
 3. Restart the API server (`artifacts/api-server: API Server` workflow)
-4. The dashboard will immediately reflect the new data
+4. Refresh the dashboard — it reads the new rows automatically
+5. No fake data is generated at any point
+
+The dashboard row count, latest record, and Last CSV Update are all derived directly from the replaced file. There is no caching layer between the file and the UI.
 
 ## Last CSV Update Timestamp
 

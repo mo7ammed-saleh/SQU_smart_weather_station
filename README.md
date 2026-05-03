@@ -4,6 +4,16 @@
 
 A full-stack environmental monitoring dashboard for the SQU Smart Weather Station. Built with React + Vite (frontend) and Express (backend), using real CSV sensor data as the single source of truth.
 
+## Updating Dashboard Data
+
+To replace the CSV data with new sensor readings:
+
+1. Replace the CSV files inside `artifacts/api-server/data/csv/`
+2. Keep the same file names: `AQT560_DATA.CSV`, `WS500_DATA.CSV`, `SMP10_DATA.CSV`, `DR30_DATA.CSV`
+3. Restart the API Server workflow
+4. Refresh the dashboard — all row counts, charts, and tables update automatically
+5. No fake data is generated at any point
+
 ---
 
 ## Features

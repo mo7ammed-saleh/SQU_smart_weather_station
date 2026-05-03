@@ -65,9 +65,18 @@ When monitoring the pipeline health, use **Last CSV Update** to confirm that the
 
 If the CSV file is missing, Last CSV Update shows **Not available** — this is a signal the pipeline has not placed the file yet.
 
+## Default Date Range on Sensor Pages
+
+When a sensor detail page opens it defaults to **Last 2 days** relative to the latest timestamp in the CSV. This means:
+- If the CSV has recent data, the page shows the latest 48 hours automatically
+- The user can switch to Last 5 days, Last 1 week, Last 2 weeks, Last 3 weeks, Last 1 month, or Custom range
+- Both the chart and the data table always follow the selected range
+- The table status bar shows: `Showing N of M filtered rows | Total CSV rows: T | Range: Last 2 days`
+
 ## Notes for Developers
 
 - Do not generate or simulate CSV rows
-- The timestamp format expected is: `"DD/MM/YYYY, HH:MM"` (quoted)
+- The timestamp format expected is: `"DD/MM/YYYY, HH:MM"` (quoted, seconds optional)
 - If a new sensor is added to the DT80W, a new CSV file and sensor config entry must be added
 - See `config/sensors.ts` in the API server to register a new sensor
+- When replacing CSV files, keep the exact same filenames — the app uses file names from `config/sensors.ts`

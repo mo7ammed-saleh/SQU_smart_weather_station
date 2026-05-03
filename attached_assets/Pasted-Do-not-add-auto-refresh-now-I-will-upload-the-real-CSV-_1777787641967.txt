@@ -1,0 +1,148 @@
+Do not add auto-refresh now.
+
+I will upload the real CSV files. Please update the app so it uses only my uploaded CSV files and does not use generated sample data.
+
+DATA SOURCE RULES
+1. Do not generate fake CSV rows.
+2. Do not overwrite my uploaded CSV files.
+3. Use only the CSV files inside:
+   backend/data/csv/
+4. The dashboard row count must exactly match the real CSV row count.
+5. Latest Record must be taken from the last row in the CSV file.
+6. Last CSV Update must be taken from the CSV file modified time on disk.
+7. Excel export must export only real CSV data.
+8. Keep reading headers dynamically from the CSV files.
+
+CSV FILE NAMES
+Use these exact files if available:
+- AQT560_DATA.CSV
+- WS500_DATA.CSV
+- SMP10_DATA.CSV
+- DR30_DATA.CSV
+
+If one file is missing:
+- Show a friendly message.
+- Do not crash the app.
+
+TABLE + CHART DATE RANGE OPTIONS
+Please improve the sensor detail pages.
+
+Add a quick range selector for both the Data Table and Chart.
+
+Options:
+- Last 2 days
+- Last 5 days
+- Last 1 week
+- Last 2 weeks
+- Last 3 weeks
+- Last 1 month
+- Custom range
+
+Default option:
+Last 2 days
+
+Behavior:
+1. When the user opens any sensor page, show only the last 2 days by default.
+2. The data table should show only rows inside the selected range.
+3. The chart should show only rows inside the selected range.
+4. The user can change the range from the dropdown.
+5. If the user selects Custom range, show From and To datetime inputs.
+6. If the selected period has no data, show:
+   No data available for the selected period.
+7. The table row count should show filtered rows, for example:
+   125 rows shown from 2,212 total CSV rows
+
+IMPORTANT:
+Do not delete the existing From/To filter. You can integrate it under Custom range.
+
+CHART CONTROL
+The chart should be optional and controlled by the user.
+
+Add:
+- Show Chart / Hide Chart toggle
+- Parameter selector dropdown
+
+Default:
+- Chart visible
+- First numeric parameter selected automatically
+
+Behavior:
+1. User can hide the chart to focus on the table.
+2. User can choose the parameter to plot.
+3. Chart data must follow the selected date range.
+4. Chart must not load all CSV rows if the selected range is smaller.
+
+TABLE CONTROL
+Improve table user control.
+
+Add:
+- Quick range selector same as chart
+- Rows per page selector:
+  - 10
+  - 20
+  - 50
+  - 100
+
+Default:
+20 rows per page
+
+Data table should show:
+- Filtered row count
+- Total CSV row count
+- Current range label
+
+Example:
+Showing 20 of 125 filtered rows | Total CSV rows: 2,212 | Range: Last 2 days
+
+HOME PAGE SENSOR CARDS
+Keep the current cards, but make sure they use real CSV data only.
+
+Each card should show:
+- Last Record
+- Parameters
+- Records
+- Status
+- Last CSV Update
+- View Details
+
+Records must be total real CSV row count.
+
+UPLOAD / REPLACE CSV INSTRUCTIONS
+Add a note in README and docs/05_CSV_DATA_FORMAT.md:
+
+To update dashboard data:
+1. Replace the CSV files inside backend/data/csv/
+2. Keep the same file names.
+3. Refresh the dashboard.
+4. The dashboard will read the new rows automatically.
+5. No fake data is generated.
+
+DOCUMENTATION UPDATE
+Update:
+- README.md
+- docs/05_CSV_DATA_FORMAT.md
+- docs/08_DT80W_DATA_FLOW.md
+- docs/11_AI_AGENT_GUIDE.md
+
+Add these rules:
+- CSV files are source of truth.
+- Do not generate sample rows unless explicitly requested for testing.
+- Default sensor page range is Last 2 days.
+- User can choose Last 2 days, Last 5 days, Last 1 week, Last 2 weeks, Last 3 weeks, Last 1 month, or Custom range.
+- Chart and table must use the selected range.
+
+TEST AFTER CHANGES
+Please test:
+1. App loads with real CSV files only.
+2. Home row count matches actual CSV row count.
+3. Sensor page default shows Last 2 days.
+4. Quick range options work.
+5. Custom range works.
+6. Chart follows selected range.
+7. Show/Hide chart works.
+8. Table follows selected range.
+9. Rows per page selector works.
+10. Excel export still exports the selected range correctly.
+11. Settings and Login still work.
+12. Zero TypeScript errors.
+13. No broken routes or missing imports.

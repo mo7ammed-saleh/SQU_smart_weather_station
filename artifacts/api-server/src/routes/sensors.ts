@@ -89,6 +89,7 @@ router.get("/:sensorId/data", (req: Request, res: Response) => {
 
   try {
     const rows = readCsv(sensor.csvFile);
+    const csvTotal = rows.length;
     let filtered = filterByDateRange(rows, from, to);
 
     if (!isNaN(maxRows) && maxRows > 0) {
@@ -98,6 +99,7 @@ router.get("/:sensorId/data", (req: Request, res: Response) => {
     res.json({
       sensorId: sensor.id,
       total: filtered.length,
+      csvTotal,
       rows: rowsToJson(filtered),
     });
   } catch (err: unknown) {
