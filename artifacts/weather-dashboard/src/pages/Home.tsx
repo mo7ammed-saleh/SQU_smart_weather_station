@@ -199,19 +199,17 @@ export function Home() {
                       onClick={() => setLocation(SENSOR_ROUTES[sensor.id])}
                     >
                       <CardContent className="p-5">
-                        <div className="flex items-start justify-between mb-3">
-                          <div className="flex flex-col items-center gap-1.5">
-                            <div
-                              className="h-11 w-11 rounded-xl flex items-center justify-center flex-shrink-0"
-                              style={{ backgroundColor: `${sensor.color}20`, color: sensor.color }}
-                            >
-                              <Icon className="h-5 w-5" />
-                            </div>
-                            <h3 className="font-bold text-sm leading-tight text-center" style={{ color: sensor.color }}>
-                              {sensor.displayName}
-                            </h3>
+                        <div className="flex flex-col items-center mb-3">
+                          <div
+                            className="h-11 w-11 rounded-xl flex items-center justify-center flex-shrink-0"
+                            style={{ backgroundColor: `${sensor.color}20`, color: sensor.color }}
+                          >
+                            <Icon className="h-5 w-5" />
                           </div>
-                          <span className="flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full bg-green-50 text-green-700 border border-green-200 shrink-0">
+                          <h3 className="font-bold text-sm leading-tight text-center mt-1.5" style={{ color: sensor.color }}>
+                            {sensor.displayName}
+                          </h3>
+                          <span className="flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full bg-green-50 text-green-700 border border-green-200 mt-1.5">
                             <CheckCircle2 className="h-3 w-3" />
                             Active
                           </span>
