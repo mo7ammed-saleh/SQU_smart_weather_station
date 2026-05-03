@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Cloud, Wind, Sun, Download, Settings,
-  Activity, Clock, Database, ArrowRight, RefreshCw, CheckCircle2, HardDrive
+  Activity, Clock, Database, ArrowRight, RefreshCw, CheckCircle2, HardDrive, Radio, AlertTriangle
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,8 +13,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import {
   useGetSensorsSummary,
-  useGetLoggerInterval,
   useSetLoggerInterval,
+  useGetLoggerStatus,
+  testLoggerConnection,
 } from "@workspace/api-client-react";
 
 const SENSOR_ICONS: Record<string, React.ElementType> = {
@@ -68,6 +70,18 @@ function formatCsvUpdate(iso: string | null | undefined) {
   }
 }
 
+function formatLoggerTimestamp(iso: string | null | undefined) {
+  if (!iso) return "Not tested";
+  try {
+    return new Date(iso).toLocaleString("en-GB", {
+      day: "2-digit", month: "short", year: "numeric",
+      hour: "2-digit", minute: "2-digit", second: "2-digit",
+    });
+  } catch {
+    return iso;
+  }
+}
+
 const container = {
   hidden: { opacity: 0 },
   show: { opacity: 1, transition: { staggerChildren: 0.1 } },
@@ -80,15 +94,45 @@ const item = {
 export function Home() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const { data: summary, isLoading: loadingSummary } = useGetSensorsSummary();
-  const { data: loggerInterval } = useGetLoggerInterval();
+  const { data: loggerStatus } = useGetLoggerStatus();
+  const testConnectionMutation = useMutation({ mutationFn: () => testLoggerConnection() });
   const setIntervalMutation = useSetLoggerInterval();
 
   const [selectedInterval, setSelectedInterval] = useState<string>("");
   const [exportSensor, setExportSensor] = useState("all");
   const [exportFrom, setExportFrom] = useState("");
   const [exportTo, setExportTo] = useState("");
+  const currentInterval = loggerStatus?.currentInterval;
+  const lastConnectionTest = loggerStatus?.lastConnectionTest ?? currentInterval?.lastConnectionTest;
+  const lastApply = loggerStatus?.lastApply ?? currentInterval?.lastApply;
+  const canApplyInterval = Boolean(loggerStatus?.canApply);
+
+  async function refreshLoggerState() {
+    await queryClient.invalidateQueries({ queryKey: ["/api/logger/status"] });
+    await queryClient.invalidateQueries({ queryKey: ["/api/logger/interval"] });
+  }
+
+  async function handleTestConnection() {
+    try {
+      const result = await testConnectionMutation.mutateAsync();
+      await refreshLoggerState();
+      toast({
+        title: result.success ? "DT80W Connection Checked" : "DT80W Connection Not Available",
+        description: result.message,
+        variant: result.success ? "default" : "destructive",
+      });
+    } catch (err) {
+      await refreshLoggerState();
+      toast({
+        title: "Connection Test Failed",
+        description: err instanceof Error ? err.message : "Could not test DT80W connection.",
+        variant: "destructive",
+      });
+    }
+  }
 
   function handleApplyInterval() {
     const found = INTERVALS.find((i) => i.code === selectedInterval);
@@ -99,11 +143,19 @@ export function Home() {
     setIntervalMutation.mutate(
       { data: { intervalLabel: found.label, intervalCode: found.code } },
       {
-        onSuccess: () => {
-          toast({ title: "Interval Updated", description: "Sampling interval saved. DT80W command integration can be connected later." });
+        onSuccess: async (data) => {
+          await refreshLoggerState();
+          toast({
+            title: data.localOnly ? "Interval Saved Locally" : "Interval Applied to Logger",
+            description: data.message ?? "Sampling interval updated.",
+          });
         },
-        onError: () => {
-          toast({ title: "Error", description: "Failed to update interval.", variant: "destructive" });
+        onError: (err) => {
+          toast({
+            title: "Error",
+            description: err instanceof Error ? err.message : "Failed to apply interval.",
+            variant: "destructive",
+          });
         },
       }
     );
@@ -275,21 +327,81 @@ export function Home() {
         <Card className="border-border">
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-base">
-              <Settings className="h-4 w-4 text-primary" />
+              <Radio className="h-4 w-4 text-primary" />
               Data Logger Sampling Interval
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {loggerInterval && (
-              <div className="flex items-center gap-2 p-3 rounded-lg bg-primary/5 border border-primary/20 text-sm">
+            {loggerStatus && (
+              <div className="space-y-3">
+                <div className="p-3 rounded-lg bg-primary/5 border border-primary/20 text-sm space-y-2">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-muted-foreground">DT80W Connection</span>
+                    <span className={`font-semibold ${loggerStatus.connectionStatus === "connected" ? "text-green-700" : loggerStatus.connectionStatus === "failed" ? "text-red-700" : "text-amber-700"}`}>
+                      {loggerStatus.connectionStatus}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-muted-foreground">Mode</span>
+                    <span className="font-mono text-xs text-primary bg-primary/10 px-2 py-0.5 rounded">
+                      {loggerStatus.mode}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-muted-foreground">Target IP:Port</span>
+                    <span className="font-mono text-xs text-foreground">
+                      {loggerStatus.targetIp}:{loggerStatus.targetPort}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-muted-foreground">Last Connection Test</span>
+                    <span className="text-xs text-right text-foreground">
+                      {formatLoggerTimestamp(lastConnectionTest?.timestamp)}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-muted-foreground">Last Apply</span>
+                    <span className="text-xs text-right text-foreground">
+                      {formatLoggerTimestamp(lastApply?.timestamp)}
+                    </span>
+                  </div>
+                </div>
+
+                <div className={`flex items-start gap-2 p-3 rounded-lg border text-xs ${loggerStatus.enabled && loggerStatus.mode === "tcp" ? "bg-green-50 border-green-200 text-green-800" : "bg-amber-50 border-amber-200 text-amber-800"}`}>
+                  {loggerStatus.enabled && loggerStatus.mode === "tcp" ? (
+                    <CheckCircle2 className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                  ) : (
+                    <AlertTriangle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                  )}
+                  <span>{loggerStatus.message}</span>
+                </div>
+              </div>
+            )}
+
+            {currentInterval && (
+              <div className="flex items-center gap-2 p-3 rounded-lg bg-muted/40 border border-border text-sm">
                 <RefreshCw className="h-4 w-4 text-primary flex-shrink-0" />
-                <span className="text-muted-foreground">Current:</span>
-                <span className="font-semibold text-foreground">{loggerInterval.intervalLabel}</span>
+                <span className="text-muted-foreground">Current interval:</span>
+                <span className="font-semibold text-foreground">{currentInterval.intervalLabel}</span>
                 <span className="ml-auto font-mono text-xs text-primary bg-primary/10 px-2 py-0.5 rounded">
-                  {loggerInterval.intervalCode}
+                  {currentInterval.intervalCode}
                 </span>
               </div>
             )}
+
+            <Button
+              onClick={handleTestConnection}
+              disabled={testConnectionMutation.isPending}
+              variant="outline"
+              className="w-full"
+            >
+              {testConnectionMutation.isPending ? (
+                <><RefreshCw className="h-4 w-4 mr-2 animate-spin" /> Testing...</>
+              ) : (
+                <><Activity className="h-4 w-4 mr-2" /> Test DT80W Connection</>
+              )}
+            </Button>
+
             <Select value={selectedInterval} onValueChange={setSelectedInterval}>
               <SelectTrigger className="bg-white">
                 <SelectValue placeholder="Select new interval..." />
@@ -304,7 +416,7 @@ export function Home() {
             </Select>
             <Button
               onClick={handleApplyInterval}
-              disabled={!selectedInterval || setIntervalMutation.isPending}
+              disabled={!selectedInterval || !canApplyInterval || setIntervalMutation.isPending}
               className="w-full"
             >
               {setIntervalMutation.isPending ? (
@@ -313,9 +425,11 @@ export function Home() {
                 <><Settings className="h-4 w-4 mr-2" /> Apply Interval to Logger</>
               )}
             </Button>
-            <p className="text-xs text-muted-foreground">
-              Interval is saved locally. Real DT80W command integration will be connected later via FTP/TCP.
-            </p>
+            {!canApplyInterval && (
+              <p className="text-xs text-muted-foreground">
+                Run a successful DT80W connection test before applying a hardware interval.
+              </p>
+            )}
           </CardContent>
         </Card>
 

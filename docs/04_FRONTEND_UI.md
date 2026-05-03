@@ -10,7 +10,7 @@
 
 ### Home (`/`)
 - Hero banner with system description and 3 pill badges (4 Active Sensors, Live CSV Data, Excel Export)
-- Logger interval selector (15M, 30M, 45M, 1H, 2H, 3H, 4H, 1D)
+- Data Logger Sampling Interval panel with DT80W status, mode, target IP/port, last connection test, last apply, connection test button, interval selector, and apply button
 - Excel export panel (sensor selector + date range + export button)
 - Sensor status cards grid (Last Record, Parameters, Records count, Status, View Details button)
 

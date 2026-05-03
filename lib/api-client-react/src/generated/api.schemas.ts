@@ -59,11 +59,43 @@ export interface ParameterMeta {
   iconType: string;
 }
 
+export interface LoggerOperationRecord {
+  success: boolean;
+  status: string;
+  message: string;
+  timestamp: string;
+  mode: string;
+  targetIp: string;
+  targetPort: number;
+  intervalCode?: string;
+  intervalLabel?: string;
+}
+
 export interface LoggerSettings {
   intervalLabel: string;
   intervalCode: string;
   updatedAt?: string;
   message?: string;
+  localOnly?: boolean;
+  applyStatus?: string;
+  lastConnectionTest?: LoggerOperationRecord | null;
+  lastApply?: LoggerOperationRecord | null;
+}
+
+export interface LoggerStatus {
+  enabled: boolean;
+  mode: string;
+  targetIp: string;
+  targetPort: number;
+  timeoutMs: number;
+  jobName: string;
+  applyFullJob: boolean;
+  connectionStatus: string;
+  canApply: boolean;
+  message: string;
+  currentInterval: LoggerSettings;
+  lastConnectionTest?: LoggerOperationRecord | null;
+  lastApply?: LoggerOperationRecord | null;
 }
 
 export interface SetIntervalBody {

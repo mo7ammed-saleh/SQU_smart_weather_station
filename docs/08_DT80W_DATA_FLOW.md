@@ -80,6 +80,11 @@ Safe default:
 ```env
 DT80_ENABLED=false
 DT80_MODE=dry-run
+DT80_IP=192.168.5.50
+DT80_PORT=7700
+DT80_TIMEOUT_MS=10000
+DT80_JOB_NAME=S_W_STAT
+DT80_APPLY_FULL_JOB=false
 ```
 
 When the logger is physically connected and the command interface is confirmed:
@@ -89,6 +94,7 @@ DT80_ENABLED=true
 DT80_MODE=tcp
 DT80_IP=192.168.5.50
 DT80_PORT=7700
+DT80_TIMEOUT_MS=10000
 ```
 
 Workflow:
@@ -96,13 +102,22 @@ Workflow:
 1. User selects a logging interval.
 2. User clicks Test DT80W Connection.
 3. If the connection succeeds, user clicks Apply Interval to Logger.
-4. Backend sends the interval update to the logger.
-5. The selected interval is saved only after a successful apply.
+4. Backend sends the interval update to the logger only when direct control is enabled and TCP mode is active.
+5. The selected interval is saved after a successful hardware apply. Disabled and dry-run modes save the interval as local-only and clearly report that no hardware command was sent.
+
+Backend endpoints:
+
+```text
+GET /api/logger/status
+GET /api/logger/test-connection
+POST /api/logger/interval
+```
 
 Safety rules:
 
 - Do not delete logger data.
 - Do not delete logger jobs.
+- Do not send `DELALLJOBS`, format, clear, or delete commands.
 - Do not enable full job apply unless it is intentionally tested.
 
 ## Sensor Status

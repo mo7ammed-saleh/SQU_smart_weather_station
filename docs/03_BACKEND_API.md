@@ -79,7 +79,15 @@ Download an Excel file (.xlsx) with sensor data.
 
 ---
 
-## Logger Interval
+## Logger Control
+
+### GET /api/logger/status
+
+Returns DT80W control status, mode, target, current interval, last connection test, and last apply.
+
+### GET /api/logger/test-connection
+
+Tests the configured DT80W target. If `DT80_ENABLED=false`, the response clearly reports disabled/local-only status. If `DT80_MODE=dry-run`, the response reports dry-run without sending a hardware command.
 
 ### GET /api/logger/interval
 
@@ -92,7 +100,7 @@ Returns the current logger interval setting.
 
 ### POST /api/logger/interval
 
-Update the logger interval.
+Apply a logger interval. In TCP mode, this requires a successful connection test before sending the DT80W interval command. In disabled or dry-run mode, the interval is saved locally and the response clearly states that no hardware command was sent.
 
 **Request:**
 ```json

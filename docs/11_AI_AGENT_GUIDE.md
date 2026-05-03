@@ -61,6 +61,11 @@ Default:
 ```env
 DT80_ENABLED=false
 DT80_MODE=dry-run
+DT80_IP=192.168.5.50
+DT80_PORT=7700
+DT80_TIMEOUT_MS=10000
+DT80_JOB_NAME=S_W_STAT
+DT80_APPLY_FULL_JOB=false
 ```
 
 Only enable direct logger control after the real logger is connected and the connection test succeeds:
@@ -73,6 +78,9 @@ DT80_MODE=tcp
 Rules:
 
 - User must test DT80W connection before applying interval.
+- `POST /api/logger/interval` must not send hardware commands unless `DT80_ENABLED=true`, `DT80_MODE=tcp`, and the most recent connection test succeeded for the configured target.
+- Disabled and dry-run modes may save interval selections as local-only, but must clearly report that no hardware command was sent.
+- Never send `DELALLJOBS`, format, clear, or delete commands for interval changes.
 - Full job apply should remain disabled unless specifically tested.
 
 ## Branding and UI Rules

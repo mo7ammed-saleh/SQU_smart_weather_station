@@ -150,6 +150,11 @@ Safe default in `.env`:
 ```env
 DT80_ENABLED=false
 DT80_MODE=dry-run
+DT80_IP=192.168.5.50
+DT80_PORT=7700
+DT80_TIMEOUT_MS=10000
+DT80_JOB_NAME=S_W_STAT
+DT80_APPLY_FULL_JOB=false
 ```
 
 When the DT80W is physically connected and the correct command interface/port is confirmed, configure:
@@ -159,6 +164,7 @@ DT80_ENABLED=true
 DT80_MODE=tcp
 DT80_IP=192.168.5.50
 DT80_PORT=7700
+DT80_TIMEOUT_MS=10000
 ```
 
 Workflow:
@@ -166,12 +172,18 @@ Workflow:
 1. User selects a logging interval.
 2. User clicks **Test DT80W Connection**.
 3. If the connection succeeds, user clicks **Apply Interval to Logger**.
-4. The backend sends the interval update to the DT80W.
+4. The backend sends the interval update to the DT80W only when `DT80_ENABLED=true`, `DT80_MODE=tcp`, and the connection test has succeeded.
+
+Local-only modes:
+
+- When `DT80_ENABLED=false`, interval changes are saved locally and no hardware command is sent.
+- When `DT80_MODE=dry-run`, interval changes are saved locally and no hardware command is sent.
 
 Important safety rules:
 
 - Do not use `DELALLJOBS` for interval changes.
 - Do not delete logger data.
+- Do not delete logger jobs.
 - Do not apply full job updates unless intentionally enabled and tested.
 
 ---

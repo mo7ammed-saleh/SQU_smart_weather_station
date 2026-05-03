@@ -130,6 +130,40 @@ export const GetLoggerIntervalResponse = zod.object({
   intervalCode: zod.string(),
   updatedAt: zod.string().optional(),
   message: zod.string().optional(),
+  localOnly: zod.boolean().optional(),
+  applyStatus: zod.string().optional(),
+  lastConnectionTest: zod
+    .union([
+      zod.object({
+        success: zod.boolean(),
+        status: zod.string(),
+        message: zod.string(),
+        timestamp: zod.string(),
+        mode: zod.string(),
+        targetIp: zod.string(),
+        targetPort: zod.number(),
+        intervalCode: zod.string().optional(),
+        intervalLabel: zod.string().optional(),
+      }),
+      zod.null(),
+    ])
+    .optional(),
+  lastApply: zod
+    .union([
+      zod.object({
+        success: zod.boolean(),
+        status: zod.string(),
+        message: zod.string(),
+        timestamp: zod.string(),
+        mode: zod.string(),
+        targetIp: zod.string(),
+        targetPort: zod.number(),
+        intervalCode: zod.string().optional(),
+        intervalLabel: zod.string().optional(),
+      }),
+      zod.null(),
+    ])
+    .optional(),
 });
 
 /**
@@ -145,4 +179,141 @@ export const SetLoggerIntervalResponse = zod.object({
   intervalCode: zod.string(),
   updatedAt: zod.string().optional(),
   message: zod.string().optional(),
+  localOnly: zod.boolean().optional(),
+  applyStatus: zod.string().optional(),
+  lastConnectionTest: zod
+    .union([
+      zod.object({
+        success: zod.boolean(),
+        status: zod.string(),
+        message: zod.string(),
+        timestamp: zod.string(),
+        mode: zod.string(),
+        targetIp: zod.string(),
+        targetPort: zod.number(),
+        intervalCode: zod.string().optional(),
+        intervalLabel: zod.string().optional(),
+      }),
+      zod.null(),
+    ])
+    .optional(),
+  lastApply: zod
+    .union([
+      zod.object({
+        success: zod.boolean(),
+        status: zod.string(),
+        message: zod.string(),
+        timestamp: zod.string(),
+        mode: zod.string(),
+        targetIp: zod.string(),
+        targetPort: zod.number(),
+        intervalCode: zod.string().optional(),
+        intervalLabel: zod.string().optional(),
+      }),
+      zod.null(),
+    ])
+    .optional(),
+});
+
+/**
+ * @summary Get DT80W logger control status
+ */
+export const GetLoggerStatusResponse = zod.object({
+  enabled: zod.boolean(),
+  mode: zod.string(),
+  targetIp: zod.string(),
+  targetPort: zod.number(),
+  timeoutMs: zod.number(),
+  jobName: zod.string(),
+  applyFullJob: zod.boolean(),
+  connectionStatus: zod.string(),
+  canApply: zod.boolean(),
+  message: zod.string(),
+  currentInterval: zod.object({
+    intervalLabel: zod.string(),
+    intervalCode: zod.string(),
+    updatedAt: zod.string().optional(),
+    message: zod.string().optional(),
+    localOnly: zod.boolean().optional(),
+    applyStatus: zod.string().optional(),
+    lastConnectionTest: zod
+      .union([
+        zod.object({
+          success: zod.boolean(),
+          status: zod.string(),
+          message: zod.string(),
+          timestamp: zod.string(),
+          mode: zod.string(),
+          targetIp: zod.string(),
+          targetPort: zod.number(),
+          intervalCode: zod.string().optional(),
+          intervalLabel: zod.string().optional(),
+        }),
+        zod.null(),
+      ])
+      .optional(),
+    lastApply: zod
+      .union([
+        zod.object({
+          success: zod.boolean(),
+          status: zod.string(),
+          message: zod.string(),
+          timestamp: zod.string(),
+          mode: zod.string(),
+          targetIp: zod.string(),
+          targetPort: zod.number(),
+          intervalCode: zod.string().optional(),
+          intervalLabel: zod.string().optional(),
+        }),
+        zod.null(),
+      ])
+      .optional(),
+  }),
+  lastConnectionTest: zod
+    .union([
+      zod.object({
+        success: zod.boolean(),
+        status: zod.string(),
+        message: zod.string(),
+        timestamp: zod.string(),
+        mode: zod.string(),
+        targetIp: zod.string(),
+        targetPort: zod.number(),
+        intervalCode: zod.string().optional(),
+        intervalLabel: zod.string().optional(),
+      }),
+      zod.null(),
+    ])
+    .optional(),
+  lastApply: zod
+    .union([
+      zod.object({
+        success: zod.boolean(),
+        status: zod.string(),
+        message: zod.string(),
+        timestamp: zod.string(),
+        mode: zod.string(),
+        targetIp: zod.string(),
+        targetPort: zod.number(),
+        intervalCode: zod.string().optional(),
+        intervalLabel: zod.string().optional(),
+      }),
+      zod.null(),
+    ])
+    .optional(),
+});
+
+/**
+ * @summary Test DT80W TCP connection
+ */
+export const TestLoggerConnectionResponse = zod.object({
+  success: zod.boolean(),
+  status: zod.string(),
+  message: zod.string(),
+  timestamp: zod.string(),
+  mode: zod.string(),
+  targetIp: zod.string(),
+  targetPort: zod.number(),
+  intervalCode: zod.string().optional(),
+  intervalLabel: zod.string().optional(),
 });

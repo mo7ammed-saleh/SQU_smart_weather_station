@@ -210,6 +210,32 @@ paths:
               schema:
                 $ref: "#/components/schemas/LoggerSettings"
 
+  /logger/status:
+    get:
+      operationId: getLoggerStatus
+      tags: [logger]
+      summary: Get DT80W logger control status
+      responses:
+        "200":
+          description: Current DT80W logger status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoggerStatus"
+
+  /logger/test-connection:
+    get:
+      operationId: testLoggerConnection
+      tags: [logger]
+      summary: Test DT80W TCP connection
+      responses:
+        "200":
+          description: Connection test result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoggerOperationRecord"
+
 components:
   schemas:
     HealthStatus:
@@ -347,9 +373,97 @@ components:
           type: string
         message:
           type: string
+        localOnly:
+          type: boolean
+        applyStatus:
+          type: string
+        lastConnectionTest:
+          anyOf:
+            - $ref: "#/components/schemas/LoggerOperationRecord"
+            - type: "null"
+        lastApply:
+          anyOf:
+            - $ref: "#/components/schemas/LoggerOperationRecord"
+            - type: "null"
       required:
         - intervalLabel
         - intervalCode
+
+    LoggerOperationRecord:
+      type: object
+      properties:
+        success:
+          type: boolean
+        status:
+          type: string
+        message:
+          type: string
+        timestamp:
+          type: string
+        mode:
+          type: string
+        targetIp:
+          type: string
+        targetPort:
+          type: integer
+        intervalCode:
+          type: string
+        intervalLabel:
+          type: string
+      required:
+        - success
+        - status
+        - message
+        - timestamp
+        - mode
+        - targetIp
+        - targetPort
+
+    LoggerStatus:
+      type: object
+      properties:
+        enabled:
+          type: boolean
+        mode:
+          type: string
+        targetIp:
+          type: string
+        targetPort:
+          type: integer
+        timeoutMs:
+          type: integer
+        jobName:
+          type: string
+        applyFullJob:
+          type: boolean
+        connectionStatus:
+          type: string
+        canApply:
+          type: boolean
+        message:
+          type: string
+        currentInterval:
+          $ref: "#/components/schemas/LoggerSettings"
+        lastConnectionTest:
+          anyOf:
+            - $ref: "#/components/schemas/LoggerOperationRecord"
+            - type: "null"
+        lastApply:
+          anyOf:
+            - $ref: "#/components/schemas/LoggerOperationRecord"
+            - type: "null"
+      required:
+        - enabled
+        - mode
+        - targetIp
+        - targetPort
+        - timeoutMs
+        - jobName
+        - applyFullJob
+        - connectionStatus
+        - canApply
+        - message
+        - currentInterval
 
     SetIntervalBody:
       type: object

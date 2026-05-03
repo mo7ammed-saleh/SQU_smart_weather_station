@@ -21,7 +21,9 @@ import type {
   ExportExcelParams,
   GetSensorDataParams,
   HealthStatus,
+  LoggerOperationRecord,
   LoggerSettings,
+  LoggerStatus,
   ParameterMeta,
   SensorDataResponse,
   SensorMeta,
@@ -810,3 +812,153 @@ export const useSetLoggerInterval = <
 > => {
   return useMutation(getSetLoggerIntervalMutationOptions(options));
 };
+
+/**
+ * @summary Get DT80W logger control status
+ */
+export const getGetLoggerStatusUrl = () => {
+  return `/api/logger/status`;
+};
+
+export const getLoggerStatus = async (
+  options?: RequestInit,
+): Promise<LoggerStatus> => {
+  return customFetch<LoggerStatus>(getGetLoggerStatusUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetLoggerStatusQueryKey = () => {
+  return [`/api/logger/status`] as const;
+};
+
+export const getGetLoggerStatusQueryOptions = <
+  TData = Awaited<ReturnType<typeof getLoggerStatus>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getLoggerStatus>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetLoggerStatusQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getLoggerStatus>>> = ({
+    signal,
+  }) => getLoggerStatus({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getLoggerStatus>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetLoggerStatusQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getLoggerStatus>>
+>;
+export type GetLoggerStatusQueryError = ErrorType<unknown>;
+
+/**
+ * @summary Get DT80W logger control status
+ */
+
+export function useGetLoggerStatus<
+  TData = Awaited<ReturnType<typeof getLoggerStatus>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getLoggerStatus>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetLoggerStatusQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Test DT80W TCP connection
+ */
+export const getTestLoggerConnectionUrl = () => {
+  return `/api/logger/test-connection`;
+};
+
+export const testLoggerConnection = async (
+  options?: RequestInit,
+): Promise<LoggerOperationRecord> => {
+  return customFetch<LoggerOperationRecord>(getTestLoggerConnectionUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getTestLoggerConnectionQueryKey = () => {
+  return [`/api/logger/test-connection`] as const;
+};
+
+export const getTestLoggerConnectionQueryOptions = <
+  TData = Awaited<ReturnType<typeof testLoggerConnection>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof testLoggerConnection>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getTestLoggerConnectionQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof testLoggerConnection>>
+  > = ({ signal }) => testLoggerConnection({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof testLoggerConnection>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type TestLoggerConnectionQueryResult = NonNullable<
+  Awaited<ReturnType<typeof testLoggerConnection>>
+>;
+export type TestLoggerConnectionQueryError = ErrorType<unknown>;
+
+/**
+ * @summary Test DT80W TCP connection
+ */
+
+export function useTestLoggerConnection<
+  TData = Awaited<ReturnType<typeof testLoggerConnection>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof testLoggerConnection>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getTestLoggerConnectionQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}

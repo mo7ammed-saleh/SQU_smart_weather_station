@@ -48,6 +48,11 @@ Safe default when the DT80W is not connected:
 ```env
 DT80_ENABLED=false
 DT80_MODE=dry-run
+DT80_IP=192.168.5.50
+DT80_PORT=7700
+DT80_TIMEOUT_MS=10000
+DT80_JOB_NAME=S_W_STAT
+DT80_APPLY_FULL_JOB=false
 ```
 
 When the logger is connected and tested:
@@ -57,7 +62,10 @@ DT80_ENABLED=true
 DT80_MODE=tcp
 DT80_IP=192.168.5.50
 DT80_PORT=7700
+DT80_TIMEOUT_MS=10000
 ```
+
+With the safe default, the Home dashboard shows DT80W direct control as disabled/local-only. Interval changes are saved locally and no hardware command is sent. Set `DT80_ENABLED=true` and `DT80_MODE=tcp` only after the logger is connected and ready for direct control.
 
 ## 4. Place CSV Files
 
@@ -163,6 +171,7 @@ Recommended update process:
 | Row count looks wrong | Check the CSV row count and refresh the dashboard |
 | Logger connection disabled | Normal when `DT80_ENABLED=false` |
 | Logger connection failed | Check logger IP, port, network, and `.env` |
+| Apply Interval button disabled | Click **Test DT80W Connection** first, or keep local-only mode with `DT80_ENABLED=false` / `DT80_MODE=dry-run` |
 | Excel export fails | Confirm backend is running and CSV files exist |
 | Need API request logs | Set `HTTP_LOGS=true` in `.env`, restart the app, then set it back to `false` after debugging |
 
