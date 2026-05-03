@@ -47,3 +47,28 @@ Thumbs.db
 # Replit
 .cache/
 .local/
+
+# Environment secrets — never commit real .env
+.env
+.env.local
+.env.*.local
+
+# Build output
+build/
+.vite/
+
+# Logs
+*.log
+
+# Uploaded/pasted assets (Replit agent scratchpad)
+attached_assets/
+
+# Keep these — do NOT add to gitignore:
+# README.md
+# docs/
+# setup-local.md
+# setup-production.md
+# .env.example
+# artifacts/api-server/data/csv/
+# artifacts/api-server/data/logger-settings.json
+# artifacts/api-server/data/users.json
