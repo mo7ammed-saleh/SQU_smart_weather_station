@@ -47,6 +47,24 @@ In the future, this can be connected to send a configuration command directly to
 SCHEDULE 1B 1= EVERY 30M
 ```
 
+## Last CSV Update vs. Last Sensor Reading
+
+The dashboard shows two different timestamps for each sensor:
+
+| Field | Meaning |
+|-------|---------|
+| **Last Record** | Timestamp of the most recent row inside the CSV file (sensor measurement time) |
+| **Last CSV Update** | File system `mtime` of the CSV file — when the file was last written to disk |
+
+These will differ when:
+- The CSV was replaced with a new export at a different time than the last measurement
+- A partial CSV was appended to (the mtime advances, but the newest sensor reading may be older)
+- File copy operations touch the mtime without changing the content
+
+When monitoring the pipeline health, use **Last CSV Update** to confirm that the DT80W → dump_dbd → CSV pipeline has run recently. Use **Last Record** to confirm the sensor is still logging data.
+
+If the CSV file is missing, Last CSV Update shows **Not available** — this is a signal the pipeline has not placed the file yet.
+
 ## Notes for Developers
 
 - Do not generate or simulate CSV rows

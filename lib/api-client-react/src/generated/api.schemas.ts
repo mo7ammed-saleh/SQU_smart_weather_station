@@ -29,6 +29,8 @@ export interface SensorSummary {
   mainValue: string;
   mainUnit: string;
   rowCount: number;
+  /** File system last-modified time of the CSV file (ISO 8601). Null if file is missing. */
+  lastCsvUpdate?: string | null;
 }
 
 export type SensorReadingData = { [key: string]: unknown };

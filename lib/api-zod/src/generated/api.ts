@@ -41,6 +41,12 @@ export const GetSensorsSummaryResponseItem = zod.object({
   mainValue: zod.string(),
   mainUnit: zod.string(),
   rowCount: zod.number(),
+  lastCsvUpdate: zod
+    .string()
+    .nullish()
+    .describe(
+      "File system last-modified time of the CSV file (ISO 8601). Null if file is missing.",
+    ),
 });
 export const GetSensorsSummaryResponse = zod.array(
   GetSensorsSummaryResponseItem,

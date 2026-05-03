@@ -266,6 +266,10 @@ components:
           type: string
         rowCount:
           type: integer
+        lastCsvUpdate:
+          type: string
+          nullable: true
+          description: "File system last-modified time of the CSV file (ISO 8601). Null if file is missing."
       required:
         - id
         - displayName

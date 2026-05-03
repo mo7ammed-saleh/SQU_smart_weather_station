@@ -51,6 +51,16 @@ To update the dashboard with real data:
 3. Restart the API server (`artifacts/api-server: API Server` workflow)
 4. The dashboard will immediately reflect the new data
 
+## Last CSV Update Timestamp
+
+The dashboard displays a **Last CSV Update** timestamp on each sensor card and sensor detail page. This value is the **file system last-modified time** (`mtime`) of the CSV file on disk — it reflects when the file was last written or replaced, not the timestamp of the most recent sensor reading inside the file.
+
+For example, if the CSV was copied to the server at 23:40 on 02 May 2026, the Last CSV Update will show `02 May 2026, 23:40:00` even if the newest row in the file has a reading timestamp of 22:00 that same day.
+
+This is intentional: it tells operators when the data file was last refreshed, which is useful for knowing whether the pipeline (DT80W → FTP → dump_dbd → CSV) has run recently.
+
+If the CSV file is missing or unreadable, the display shows **Not available** and the dashboard does not crash.
+
 ## Expected Date Range
 
 The current CSV files contain data from approximately October 2024. Any date filter outside this range will return zero rows — this is expected and not an error.

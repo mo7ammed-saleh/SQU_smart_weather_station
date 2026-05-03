@@ -15,6 +15,7 @@ import {
   useGetSensorLatest,
   useGetSensorData,
   useGetSensorParameters,
+  useGetSensorsSummary,
   getGetSensorLatestQueryKey,
   getGetSensorDataQueryKey,
   getGetSensorParametersQueryKey,
@@ -78,6 +79,9 @@ export function SensorPage({ sensorId }: { sensorId: string }) {
   const [selectedParam, setSelectedParam] = useState<string>("");
   const [page, setPage] = useState(0);
 
+  const { data: allSummaries } = useGetSensorsSummary();
+  const csvUpdate = allSummaries?.find((s) => s.id === sensorId)?.lastCsvUpdate ?? null;
+
   const { data: parameters, isLoading: loadingParams } = useGetSensorParameters(sensorId, {
     query: { enabled: !!sensorId, queryKey: getGetSensorParametersQueryKey(sensorId) },
   });
@@ -137,6 +141,12 @@ export function SensorPage({ sensorId }: { sensorId: string }) {
               ? "Loading..."
               : `${(sensorData?.total ?? 0).toLocaleString()} records${(appliedFrom || appliedTo) ? " · filtered" : " · all CSV data"}`}
           </p>
+          <span className="inline-flex items-center gap-1 mt-1.5 text-xs text-muted-foreground bg-muted/50 border border-border rounded-full px-2.5 py-0.5">
+            <Activity className="h-3 w-3 shrink-0" />
+            CSV Updated: {csvUpdate
+              ? new Date(csvUpdate).toLocaleString("en-GB", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit", second: "2-digit" })
+              : "Not available"}
+          </span>
         </div>
         <Button variant="outline" size="sm" onClick={handleExport} className="self-start">
           <Download className="h-4 w-4 mr-2" /> Export Excel

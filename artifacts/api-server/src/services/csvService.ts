@@ -23,6 +23,16 @@ function parseTimestamp(raw: string): Date {
   return new Date(cleaned);
 }
 
+export function getCsvLastModified(csvFile: string): string | null {
+  try {
+    const filePath = path.join(CSV_DIR, csvFile);
+    const stat = fs.statSync(filePath);
+    return stat.mtime.toISOString();
+  } catch {
+    return null;
+  }
+}
+
 export function readCsv(csvFile: string): CsvRow[] {
   const filePath = path.join(CSV_DIR, csvFile);
   if (!fs.existsSync(filePath)) {

@@ -1,6 +1,6 @@
 import { Router, Request, Response } from "express";
 import { SENSORS, getSensorById } from "../config/sensors.js";
-import { readCsv, filterByDateRange, rowsToJson } from "../services/csvService.js";
+import { readCsv, filterByDateRange, rowsToJson, getCsvLastModified } from "../services/csvService.js";
 
 const router = Router();
 
@@ -46,6 +46,7 @@ router.get("/summary", (_req: Request, res: Response) => {
       mainValue,
       mainUnit: sensor.mainUnit,
       rowCount,
+      lastCsvUpdate: getCsvLastModified(sensor.csvFile),
     };
   });
 

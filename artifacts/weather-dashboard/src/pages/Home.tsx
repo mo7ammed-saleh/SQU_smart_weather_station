@@ -3,7 +3,7 @@ import { useLocation } from "wouter";
 import { motion } from "framer-motion";
 import {
   Cloud, Wind, Sun, Download, Settings,
-  Activity, Clock, Database, ArrowRight, RefreshCw, CheckCircle2
+  Activity, Clock, Database, ArrowRight, RefreshCw, CheckCircle2, HardDrive
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -52,6 +52,18 @@ function formatTimestamp(iso: string) {
     });
   } catch {
     return iso;
+  }
+}
+
+function formatCsvUpdate(iso: string | null | undefined) {
+  if (!iso) return "Not available";
+  try {
+    return new Date(iso).toLocaleString("en-GB", {
+      day: "2-digit", month: "short", year: "numeric",
+      hour: "2-digit", minute: "2-digit", second: "2-digit",
+    });
+  } catch {
+    return "Not available";
   }
 }
 
@@ -230,6 +242,14 @@ export function Home() {
                           <div className="flex items-center justify-between">
                             <span className="text-muted-foreground">Status</span>
                             <span className="font-medium text-green-600">Active</span>
+                          </div>
+                          <div className="flex items-start justify-between border-t border-border pt-1.5 mt-1 gap-2">
+                            <span className="text-muted-foreground flex items-center gap-1 shrink-0">
+                              <HardDrive className="h-3 w-3" /> Last CSV Update
+                            </span>
+                            <span className="font-medium text-foreground text-right text-[11px] leading-tight">
+                              {formatCsvUpdate(sensor.lastCsvUpdate)}
+                            </span>
                           </div>
                         </div>
 
