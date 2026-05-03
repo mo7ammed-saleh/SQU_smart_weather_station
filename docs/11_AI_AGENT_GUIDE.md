@@ -1,79 +1,122 @@
 # 11 — AI Agent Guide
 
-This file is for AI coding tools (GitHub Copilot, Claude, GPT, Cursor, Replit Agent, etc.) that need to understand, maintain, or extend this project.
-
----
+This guide is for future AI coding tools and developers working on the SQU Smart Weather Station Dashboard.
 
 ## Project Purpose
 
-This is a **full-stack environmental monitoring dashboard** for Sultan Qaboos University (SQU), developed by iLab Marine.
+Full-stack monitoring dashboard for Sultan Qaboos University Smart Weather Station, developed by iLab Marine.
 
-- Frontend: React + Vite + TypeScript
-- Backend: Express + Node.js + TypeScript
-- Data: CSV files only (no database yet)
-- Auth: JSON file (users.json)
-
----
+- Frontend: React, Vite, TypeScript
+- Backend: Express, Node.js, TypeScript
+- Data: CSV files only
+- Auth: JSON file authentication
+- Export: Excel files
+- Logger: DT80W interval control support
 
 ## Critical Rules
 
-### 1. Never generate fake CSV data
-The CSV files contain real sensor measurements. Do not add, simulate, or generate any rows. Every row must come from the physical sensor. Do not generate sample rows unless the user explicitly requests it for isolated testing.
+### CSV Data
 
-### 2. Never overwrite real CSV files
-The files in `artifacts/api-server/data/csv/` are the source of truth. If you need test data, use a copy. Never modify the originals.
+- Never generate fake CSV data.
+- Never simulate sensor rows.
+- CSV source is always:
 
-### 3. CSV headers are dynamic
-Column names are read directly from the CSV header row. Do not hardcode column names in the frontend or backend. The UI adapts automatically.
+```text
+DB/CSV_Files/
+```
 
-### 4. Keep the sidebar on the LEFT
-The navigation sidebar is on the left side of the layout. Do not move it to the right or change it to a top navigation bar.
+Required files:
 
-### 5. Keep Smart Weather Station branding
-- Project title: **Smart Weather Station**
+```text
+AQT560_DATA.CSV
+WS500_DATA.CSV
+SMP10_DATA.CSV
+DR30_DATA.CSV
+```
+
+Do not use old CSV folders under `artifacts/api-server/data/`.
+
+### Dynamic Headers
+
+CSV headers are dynamic. The table and chart parameter list should adapt to CSV headers. Friendly labels, units, icons, and sensor names can be configured in backend sensor config.
+
+### Python Updater
+
+The dashboard does not read DBD files directly.
+
+Final data pipeline:
+
+1. DT80W logs DBD files.
+2. Python downloads DBD files by FTP.
+3. Python converts DBD to CSV with `dump_dbd.exe`.
+4. Python saves CSV files into `DB/CSV_Files/`.
+5. Dashboard reads CSV files from disk.
+
+### DT80W Logger Control
+
+Keep logger control safe.
+
+Default:
+
+```env
+DT80_ENABLED=false
+DT80_MODE=dry-run
+```
+
+Only enable direct logger control after the real logger is connected and the connection test succeeds:
+
+```env
+DT80_ENABLED=true
+DT80_MODE=tcp
+```
+
+Rules:
+
+- User must test DT80W connection before applying interval.
+- Full job apply should remain disabled unless specifically tested.
+
+## Branding and UI Rules
+
+- Project title: Smart Weather Station
 - Organization: Sultan Qaboos University
 - Developer: iLab Marine
-- Do not rename the project or change the branding.
-
-### 6. Login uses the API
-`POST /api/auth/login` validates against `data/users.json`. Do not revert to hardcoded credentials.
-
-### 7. Default sensor page range is Last 2 days
-When any sensor detail page loads, it defaults to showing only the last 2 days of data relative to the latest record in the CSV. The user can change this to Last 5 days, Last 1 week, Last 2 weeks, Last 3 weeks, Last 1 month, or Custom range. Chart and table both follow the selected range.
-
-### 8. csvTotal vs total in API responses
-The `/api/sensors/:id/data` endpoint returns both:
-- `total` — the number of rows returned after the date filter
-- `csvTotal` — the total row count in the CSV file regardless of any filter
-Both are shown in the data table status bar.
-
----
-
-## Where to Add New Sensors
-
-1. Add the CSV file to `artifacts/api-server/data/csv/`
-2. Register the sensor in `artifacts/api-server/src/config/sensors.ts`
-3. Add a route entry in `artifacts/weather-dashboard/src/components/layout/Sidebar.tsx`
-4. Add an icon mapping in `artifacts/weather-dashboard/src/pages/Home.tsx`
-
-## Where to Add Future DT80W Integration
-
-- Backend trigger: add a route in `artifacts/api-server/src/routes/`
-- Python script call: use `child_process.exec` from Node.js
-- Interval command: extend `artifacts/api-server/src/routes/logger.ts`
-- See `08_DT80W_DATA_FLOW.md` for full architecture
+- Sidebar stays on the left.
+- Keep login, settings, export, charts, and sensor pages intact.
 
 ## Key File Locations
 
-| What | Where |
-|------|-------|
-| Auth store (frontend) | `artifacts/weather-dashboard/src/lib/auth.ts` |
-| Login page | `artifacts/weather-dashboard/src/pages/Login.tsx` |
-| Settings page | `artifacts/weather-dashboard/src/pages/Settings.tsx` |
-| Sidebar | `artifacts/weather-dashboard/src/components/layout/Sidebar.tsx` |
-| Header | `artifacts/weather-dashboard/src/components/layout/Header.tsx` |
+| What | Location |
+|---|---|
+| CSV files | `DB/CSV_Files/` |
+| Backend | `artifacts/api-server/` |
+| Frontend | `artifacts/weather-dashboard/` |
 | Sensor config | `artifacts/api-server/src/config/sensors.ts` |
 | CSV service | `artifacts/api-server/src/services/csvService.ts` |
-| User service | `artifacts/api-server/src/services/userSettingsService.ts` |
+| Excel service | `artifacts/api-server/src/services/excelService.ts` |
+| Logger service | `artifacts/api-server/src/services/dt80LoggerService.ts` |
+| Logger routes | `artifacts/api-server/src/routes/logger.ts` |
 | Users file | `artifacts/api-server/data/users.json` |
-| CSV files | `artifacts/api-server/data/csv/` |
+| Logger settings | `artifacts/api-server/data/logger-settings.json` |
+| DT80 template | `artifacts/api-server/dt80/job-template.dxc` |
+| Login page | `artifacts/weather-dashboard/src/pages/Login.tsx` |
+| Home page | `artifacts/weather-dashboard/src/pages/Home.tsx` |
+| Sensor page | `artifacts/weather-dashboard/src/pages/SensorPage.tsx` |
+| Settings page | `artifacts/weather-dashboard/src/pages/Settings.tsx` |
+
+## Adding a New Sensor
+
+1. Add the CSV file to `DB/CSV_Files/`.
+2. Add sensor metadata in `artifacts/api-server/src/config/sensors.ts`.
+3. Add sidebar/home UI mapping if required.
+4. Keep CSV headers dynamic.
+5. Update docs if it is a permanent sensor.
+
+## Export Behavior
+
+- Top export button on a sensor page exports all CSV rows for that sensor.
+- Data Table export exports only selected or filtered rows.
+- Home export supports one sensor or all sensors.
+
+## Local Setup Reminder
+
+Use `setup-local.md` for Windows installation. GitHub Pages is not suitable because this project requires an Express backend.
