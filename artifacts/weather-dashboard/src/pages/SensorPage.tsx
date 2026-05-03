@@ -35,6 +35,19 @@ const ICON_MAP: Record<string, React.ElementType> = {
   settings: Activity,
 };
 
+const ICON_COLORS: Record<string, string> = {
+  thermometer: "#ef4444",
+  droplets:    "#3b82f6",
+  gauge:       "#8b5cf6",
+  wind:        "#06b6d4",
+  sun:         "#f59e0b",
+  cloud:       "#64748b",
+  activity:    "#06b6d4",
+  "cloud-rain":"#3b82f6",
+  compass:     "#06b6d4",
+  settings:    "#6b7280",
+};
+
 const SENSOR_COLORS: Record<string, string> = {
   aqt560: "#0ea5e9",
   ws500: "#10b981",
@@ -210,30 +223,40 @@ export function SensorPage({ sensorId }: { sensorId: string }) {
               ))
             : (parameters ?? []).map((param) => {
                 const Icon = ICON_MAP[param.iconType] ?? Activity;
+                const iconColor = ICON_COLORS[param.iconType] ?? "#06b6d4";
                 const val = latest?.data?.[param.key];
                 const displayVal = val !== undefined && val !== null
                   ? (typeof val === "number" ? (val as number).toFixed(1) : String(val))
                   : "--";
                 return (
-                  <motion.div key={param.key} variants={item}>
-                    <Card className="border-border hover:shadow-sm hover:-translate-y-0.5 transition-all duration-150">
-                      <CardContent className="p-4">
-                        <div className="h-8 w-8 rounded-lg flex items-center justify-center mb-2"
-                          style={{ backgroundColor: `${color}18`, color }}>
-                          <Icon className="h-4 w-4" />
+                  <motion.div key={param.key} variants={item} className="h-full">
+                    <Card className="border-border hover:shadow-md hover:-translate-y-0.5 transition-all duration-150 h-full">
+                      <CardContent className="p-4 flex flex-col items-center text-center h-full min-h-[168px]">
+                        {/* Icon — top center */}
+                        <div
+                          className="h-11 w-11 rounded-full flex items-center justify-center mt-1 mb-3 flex-shrink-0"
+                          style={{ backgroundColor: `${iconColor}18`, color: iconColor }}
+                        >
+                          <Icon className="h-5 w-5" />
                         </div>
-                        <div className="text-lg font-bold text-foreground leading-tight">
+                        {/* Parameter name — centered, bold, colored */}
+                        <div
+                          className="text-xs font-bold leading-snug mb-2 px-1 line-clamp-2"
+                          style={{ color: iconColor }}
+                        >
+                          {param.label}
+                        </div>
+                        {/* Value — centered, large */}
+                        <div className="text-2xl font-bold text-foreground leading-none">
                           {displayVal}
                           {param.unit && (
                             <span className="text-xs font-normal text-muted-foreground ml-1">{param.unit}</span>
                           )}
                         </div>
-                        <div className="text-xs text-muted-foreground mt-1 leading-tight line-clamp-2">
-                          {param.label}
-                        </div>
+                        {/* Timestamp — bottom left */}
                         {latest?.timestamp && (
-                          <div className="text-[10px] text-muted-foreground/60 mt-1">
-                            {formatFull(latest.timestamp)}
+                          <div className="text-[10px] text-muted-foreground/70 mt-auto pt-3 self-start text-left leading-snug">
+                            Last Reading:<br />{formatFull(latest.timestamp)}
                           </div>
                         )}
                       </CardContent>
@@ -324,7 +347,7 @@ export function SensorPage({ sensorId }: { sensorId: string }) {
           </div>
         </CardHeader>
         {showChart && (
-          <CardContent>
+          <CardContent className="bg-gradient-to-br from-sky-50/70 to-cyan-50/40 rounded-b-lg">
             {loadingData ? (
               <Skeleton className="h-72 w-full rounded-lg" />
             ) : chartData.length === 0 ? (
@@ -370,7 +393,7 @@ export function SensorPage({ sensorId }: { sensorId: string }) {
             <CardTitle className="text-base flex items-center gap-2">
               <TableIcon className="h-4 w-4 text-primary" /> Data Table
             </CardTitle>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <span className="text-xs text-muted-foreground shrink-0">Rows per page:</span>
               <Select
                 value={String(rowsPerPage)}
@@ -385,6 +408,13 @@ export function SensorPage({ sensorId }: { sensorId: string }) {
                   ))}
                 </SelectContent>
               </Select>
+              <Button
+                size="sm" variant="outline"
+                onClick={handleExport}
+                className="flex items-center gap-1.5 text-xs h-8 shrink-0"
+              >
+                <Download className="h-3.5 w-3.5" /> Export Selected Data
+              </Button>
             </div>
           </div>
           {!loadingData && sensorData && (
@@ -416,7 +446,7 @@ export function SensorPage({ sensorId }: { sensorId: string }) {
                         return (
                           <th
                             key={col}
-                            className="px-3 py-2.5 text-left font-semibold text-muted-foreground whitespace-nowrap"
+                            className="px-3 py-2.5 text-center font-semibold text-muted-foreground whitespace-nowrap"
                           >
                             {meta ? meta.label : col === "timestamp" ? "Timestamp" : col}
                             {meta?.unit && (
@@ -436,7 +466,7 @@ export function SensorPage({ sensorId }: { sensorId: string }) {
                         {tableColumns.map((col) => (
                           <td
                             key={col}
-                            className="px-3 py-2 whitespace-nowrap text-foreground/80 font-mono"
+                            className="px-3 py-2 whitespace-nowrap text-center text-foreground/80 font-mono"
                           >
                             {col === "timestamp"
                               ? formatFull(String(row[col]))

@@ -1,0 +1,135 @@
+Please apply these UI improvements to the Sensor Detail pages only. Keep the existing functionality, CSV logic, filters, export, settings, login, and routing unchanged.
+
+SENSOR PAGE — LATEST READINGS CARDS
+
+Please redesign the value cards under "Latest Readings" to make them more organized and visually clear.
+
+Current issue:
+The parameter name, value, and icon are not visually balanced. I want the cards to look more professional and centered.
+
+Required card layout:
+
+1. Icon
+- Place the icon at the top center of the card.
+- Use a different meaningful colored icon for each parameter type where possible.
+- Icons should visually represent the value:
+  - Temperature: thermometer icon, warm red/orange accent
+  - Humidity: droplet icon, blue accent
+  - Pressure: gauge icon, purple/blue accent
+  - Wind: wind icon, cyan accent
+  - Radiation / solar: sun icon, orange/yellow accent
+  - Gas values like NO2, SO2, CO, H2S, O3, NO: air/cloud/activity icon, teal/blue accent
+  - Particulate matter PM values: particles/cloud icon, gray/blue accent
+  - Battery/voltage: battery icon, green accent
+  - Rain/precipitation: cloud-rain icon, blue accent
+  - Unknown/default: activity icon, cyan accent
+
+2. Parameter name
+- Center the parameter name.
+- Make it medium font size.
+- Make it bold.
+- Use the same color theme as the icon/accent.
+- Example:
+  Air Temperature
+  Air Humidity
+  Air Pressure
+
+3. Value
+- Center the value.
+- Make it slightly larger than the name.
+- Use a clean bold font.
+- Use the same accent color or a strong readable dark color with accent unit.
+- Keep unit beside the value.
+- Example:
+  39.0 °C
+
+4. Timestamp
+- Keep timestamp at the left side or bottom-left as current style, but add label:
+  Last Reading: 29 Apr 2026, 20:15:00
+
+5. Card style
+- White card background.
+- Soft border.
+- Rounded corners.
+- Subtle shadow.
+- Slight hover effect.
+- Keep all cards same height.
+- Content should be vertically aligned and clean.
+- Do not make cards too dark.
+
+Suggested card structure:
+- Top center: icon
+- Center: parameter name
+- Center: value + unit
+- Bottom-left: Last Reading: timestamp
+
+DATA TABLE
+
+Please improve the Data Table alignment:
+
+1. Center all table header text.
+2. Center all table values.
+3. Keep timestamp readable.
+4. Keep horizontal scroll working.
+5. Keep pagination working.
+6. Keep row count text working.
+
+PARAMETER CHART PANEL
+
+Please improve the Parameter Chart panel style:
+
+1. Add a light colored background to the chart panel.
+2. Use a soft blue/cyan gradient or very light blue background.
+3. Keep it easy on the eyes.
+4. Keep chart readable.
+5. Keep the parameter selector and show/hide chart toggle working.
+6. Do not change chart logic.
+
+DATA TABLE EXPORT
+
+Add an "Export Excel" button inside or near the Data Table panel also.
+
+Purpose:
+The user should be able to export the currently selected/filtered table data directly from the Data Table area.
+
+Requirements:
+1. Add button label:
+   Export Selected Data
+
+2. Place it at the top-right of the Data Table card/header.
+
+3. It should export the currently filtered data based on:
+   - selected quick range
+   - custom date range if selected
+   - current sensor
+
+4. It should use the existing Excel export backend logic if possible.
+
+5. The exported Excel file should contain only the selected/filtered data, not the full CSV unless the current selected range includes all data.
+
+6. Keep the existing Export Excel button at the top of the sensor page if already present, but make sure both export buttons work.
+
+IMPORTANT DATA RULES
+
+Do not change data source logic.
+Do not generate fake CSV rows.
+Do not overwrite CSV files.
+Use only the real CSV files in backend/data/csv.
+Keep dynamic CSV headers.
+Keep row count matching the CSV.
+
+TEST AFTER CHANGES
+
+Please test:
+1. Latest Reading cards look centered and organized.
+2. Icons are colored and meaningful.
+3. Parameter names are centered, bold, and colored.
+4. Values are centered and readable.
+5. Timestamp shows "Last Reading:".
+6. Table headers and values are centered.
+7. Chart panel has a light colored background.
+8. Export Selected Data button exports the currently filtered data.
+9. Existing Export Excel still works.
+10. Filters, quick ranges, chart selector, pagination, login, settings, and sidebar still work.
+11. Zero TypeScript errors.
+12. No broken routes or missing imports.
