@@ -1,70 +1,72 @@
 # 02 — Folder Structure
 
-```
-workspace/
+Final project structure:
+
+```text
+SQU_smart_weather_station/
+├── README.md
+├── package.json
+├── pnpm-workspace.yaml
+├── pnpm-lock.yaml
+├── .env.example
+├── .gitignore
+├── .replit
+├── setup-local.md
+├── setup-production.md
+├── DB/
+│   └── CSV_Files/
+│       ├── AQT560_DATA.CSV
+│       ├── WS500_DATA.CSV
+│       ├── SMP10_DATA.CSV
+│       └── DR30_DATA.CSV
 ├── artifacts/
-│   ├── api-server/                 # Express backend
+│   ├── api-server/
 │   │   ├── src/
-│   │   │   ├── app.ts              # Express app setup
-│   │   │   ├── index.ts            # Server entry point
+│   │   │   ├── app.ts
+│   │   │   ├── index.ts
 │   │   │   ├── routes/
-│   │   │   │   ├── index.ts        # Route registry
-│   │   │   │   ├── auth.ts         # POST /api/auth/login
-│   │   │   │   ├── sensors.ts      # GET /api/sensors/...
-│   │   │   │   ├── export.ts       # GET /api/export
-│   │   │   │   ├── logger.ts       # GET/POST /api/logger/interval
-│   │   │   │   ├── settings.ts     # GET/PUT /api/settings/user
-│   │   │   │   └── health.ts       # GET /api/healthz
+│   │   │   │   ├── auth.ts
+│   │   │   │   ├── sensors.ts
+│   │   │   │   ├── export.ts
+│   │   │   │   ├── logger.ts
+│   │   │   │   ├── settings.ts
+│   │   │   │   └── health.ts
 │   │   │   ├── services/
-│   │   │   │   ├── csvService.ts           # CSV reading & filtering
-│   │   │   │   ├── excelService.ts         # Excel workbook builder
-│   │   │   │   ├── loggerSettingsService.ts # Read/write logger-settings.json
-│   │   │   │   └── userSettingsService.ts  # Read/write users.json
+│   │   │   │   ├── csvService.ts
+│   │   │   │   ├── excelService.ts
+│   │   │   │   ├── dt80LoggerService.ts
+│   │   │   │   ├── loggerSettingsService.ts
+│   │   │   │   └── userSettingsService.ts
 │   │   │   ├── config/
-│   │   │   │   └── sensors.ts      # Sensor definitions (id, name, file, params)
+│   │   │   │   └── sensors.ts
 │   │   │   └── lib/
-│   │   │       └── logger.ts       # Pino logger singleton
-│   │   └── data/
-│   │       ├── users.json          # User credentials (JSON auth)
-│   │       ├── logger-settings.json
-│   │       └── csv/
-│   │           ├── AQT560_DATA.CSV
-│   │           ├── WS500_DATA.CSV
-│   │           ├── SMP10_DATA.CSV
-│   │           └── DR30_DATA.CSV
-│   │
-│   └── weather-dashboard/          # React + Vite frontend
+│   │   │       └── logger.ts
+│   │   ├── dt80/
+│   │   │   └── job-template.dxc
+│   │   ├── data/
+│   │   │   ├── users.json
+│   │   │   └── logger-settings.json
+│   │   ├── package.json
+│   │   └── tsconfig.json
+│   └── weather-dashboard/
 │       ├── public/
-│       │   ├── company-logo.png    # iLab Marine logo
-│       │   └── squ-logo.png        # SQU crest logo
-│       └── src/
-│           ├── App.tsx             # Root router
-│           ├── main.tsx            # React entry point
-│           ├── index.css           # Global styles + animations
-│           ├── lib/
-│           │   └── auth.ts         # Zustand auth store
-│           ├── pages/
-│           │   ├── Login.tsx       # Login page (calls /api/auth/login)
-│           │   ├── Home.tsx        # Dashboard home
-│           │   ├── SensorPage.tsx  # Sensor detail + chart + table
-│           │   ├── Settings.tsx    # User settings page
-│           │   └── not-found.tsx   # 404 page
-│           └── components/
-│               ├── layout/
-│               │   ├── AppLayout.tsx   # Main layout wrapper + footer
-│               │   ├── Header.tsx      # Top header bar
-│               │   └── Sidebar.tsx     # Left navigation sidebar
-│               └── ui/                 # shadcn/ui components
-│
+│       │   ├── company-logo.png
+│       │   └── squ-logo.png
+│       ├── src/
+│       ├── package.json
+│       └── vite.config.ts
 ├── lib/
-│   ├── api-spec/               # OpenAPI spec + Orval codegen config
-│   │   └── openapi.yaml        # Contract-first API definition
-│   └── api-client-react/       # Generated TanStack Query hooks
-│
-├── docs/                       # Project documentation
-├── setup-local.md              # How to run locally on Windows
-├── setup-production.md         # How to deploy to production
-├── .env.example                # Example environment variables
-├── README.md                   # Project overview
-└── pnpm-workspace.yaml         # pnpm monorepo config
+│   ├── api-spec/
+│   └── api-client-react/
+├── docs/
+└── scripts/
 ```
+
+## Key Rules
+
+- Final CSV source: `DB/CSV_Files/`.
+- User credentials: `artifacts/api-server/data/users.json`.
+- Logger settings: `artifacts/api-server/data/logger-settings.json`.
+- Do not store sensor CSV files under `artifacts/api-server/data/`.
+- Do not generate fake CSV rows.
+- Keep frontend and backend as separate pnpm workspace packages.
