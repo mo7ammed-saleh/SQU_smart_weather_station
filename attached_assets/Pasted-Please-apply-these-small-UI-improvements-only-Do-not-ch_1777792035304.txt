@@ -1,0 +1,195 @@
+Please apply these small UI improvements only. Do not change data logic, CSV reading, export, settings, login, or routes.
+
+SENSOR DETAIL PAGE — LATEST READINGS CARDS
+
+The current colors are good. Keep the color theme.
+
+But the parameter names are too small.
+
+Please update the parameter name text in each latest reading card:
+
+1. Make the parameter name larger.
+   Example names:
+   - Air Temperature
+   - Air Humidity
+   - Air Pressure
+   - NO₂
+   - SO₂
+   - CO
+   - H₂S
+   - O₃
+   - PM2.5
+   - Wind Speed
+
+2. Make the parameter name:
+   - centered
+   - bold
+   - medium-large font
+   - same accent color as the icon
+   - easy to read
+
+3. Keep the value centered and strong.
+
+4. Keep the card layout:
+   - Icon centered at top
+   - Parameter name centered below icon
+   - Value centered below name
+   - Last Reading timestamp at bottom
+
+5. If possible, improve icons so each value has a more meaningful icon:
+   - Air Temperature: thermometer
+   - Air Humidity: droplet
+   - Air Pressure: gauge
+   - Wind values: wind icon
+   - Radiation / solar: sun icon
+   - Rain / precipitation: cloud-rain
+   - Gas values NO₂, SO₂, CO, H₂S, O₃, NO: cloud/activity/air icon
+   - PM values: cloud/particles icon
+   - Battery/voltage: battery icon
+   - Status/quality/code: activity/check icon
+
+6. The WS500 sensor cards currently look perfect in color/icon style. Use the same quality/style for all sensors.
+
+7. Keep card colors professional and consistent. Do not make the UI too colorful or messy.
+
+DATA TABLE — DATE SELECTION
+
+Please improve the Data Table controls.
+
+1. Add a date selector inside the Data Table panel.
+
+2. The user must be able to select a specific date from available CSV data.
+
+3. Add a dropdown or date input labeled:
+   Select Date
+
+4. Behavior:
+   - When user selects a date, the table shows only rows from that date.
+   - The selected date should filter the same CSV data already loaded.
+   - Do not generate data.
+   - Do not change CSV files.
+   - If the selected date has no records, show:
+     No data available for the selected date.
+
+5. Keep existing quick range options:
+   - Last 2 days
+   - Last 5 days
+   - Last 1 week
+   - Last 2 weeks
+   - Last 3 weeks
+   - Last 1 month
+   - Custom range
+
+6. Add Select Date as another option or separate control.
+   Recommended options:
+   - Quick Range dropdown
+   - Select Date input
+   - Custom From/To range
+
+7. The table row count should update based on selected date.
+
+Example:
+Showing 10 rows for 29 Apr 2026 | Total CSV rows: 2,212
+
+8. The chart should also follow the selected date if a date is selected.
+
+9. Export Selected Data should export only the rows for the selected date if date filter is active.
+
+DATA TABLE ALIGNMENT
+
+1. Center all table header text.
+2. Center all table values.
+3. Keep timestamp readable.
+4. Keep horizontal scroll working.
+5. Keep pagination working.
+6. Keep row count text working.
+
+PARAMETER CHART PANEL
+
+Please improve the Parameter Chart panel style:
+
+1. Add a light colored background to the chart panel.
+2. Use a soft blue/cyan gradient or very light blue background.
+3. Keep it easy on the eyes.
+4. Keep chart readable.
+5. Keep the parameter selector and show/hide chart toggle working.
+6. Chart data must follow the selected table/date/range filter.
+
+DATA TABLE EXPORT
+
+Add an "Export Excel" button inside or near the Data Table panel also.
+
+Purpose:
+The user should be able to export the currently selected/filtered table data directly from the Data Table area.
+
+Requirements:
+1. Add button label:
+   Export Selected Data
+
+2. Place it at the top-right of the Data Table card/header.
+
+3. It should export the currently filtered data based on:
+   - selected quick range
+   - selected date
+   - custom date range if selected
+   - current sensor
+
+4. It should use the existing Excel export backend logic if possible.
+
+5. The exported Excel file should contain only the selected/filtered data, not the full CSV unless the current selected range includes all data.
+
+6. Keep the existing Export Excel button at the top of the sensor page if already present, but make sure both export buttons work.
+
+HOME DASHBOARD — SENSOR STATUS OVERVIEW CARDS
+
+Please improve the Home Dashboard sensor cards.
+
+1. For each sensor card, center the sensor icon and sensor name together.
+
+Example:
+[icon centered]
+AQT560 Air Quality
+
+2. Apply this to all sensor cards:
+- AQT560 Air Quality
+- WS500 Smart Weather
+- SMP10 Pyranometer
+- DR30 Pyrheliometer
+
+3. Sensor name should be:
+- centered
+- bold
+- slightly larger
+- aligned with icon
+- clean and professional
+
+4. Keep the rest of the card as it is:
+- Last Record
+- Parameters
+- Records
+- Status
+- Last CSV Update
+- View Details
+
+IMPORTANT
+
+Do not change:
+- CSV logic
+- row counts
+- generated data rules
+- Settings page
+- Login
+- Sidebar
+- Header/footer
+
+After editing, test:
+1. AQT560 latest reading card names are larger and readable.
+2. WS500 still looks perfect.
+3. All sensor latest reading cards keep good icons and colors.
+4. Home sensor names and icons are centered.
+5. Data Table has Select Date control.
+6. Selecting a date filters table rows correctly.
+7. Chart follows selected date.
+8. Export Selected Data exports only selected date/range rows.
+9. Zero TypeScript errors.
+10. No broken routes.

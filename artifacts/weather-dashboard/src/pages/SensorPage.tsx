@@ -56,13 +56,14 @@ const SENSOR_COLORS: Record<string, string> = {
 };
 
 const QUICK_RANGES = [
-  { value: "2d",  label: "Last 2 days",   days: 2  },
-  { value: "5d",  label: "Last 5 days",   days: 5  },
-  { value: "1w",  label: "Last 1 week",   days: 7  },
-  { value: "2w",  label: "Last 2 weeks",  days: 14 },
-  { value: "3w",  label: "Last 3 weeks",  days: 21 },
-  { value: "1m",  label: "Last 1 month",  days: 30 },
-  { value: "custom", label: "Custom range", days: 0 },
+  { value: "2d",    label: "Last 2 days",   days: 2  },
+  { value: "5d",    label: "Last 5 days",   days: 5  },
+  { value: "1w",    label: "Last 1 week",   days: 7  },
+  { value: "2w",    label: "Last 2 weeks",  days: 14 },
+  { value: "3w",    label: "Last 3 weeks",  days: 21 },
+  { value: "1m",    label: "Last 1 month",  days: 30 },
+  { value: "date",  label: "Select Date",   days: 0  },
+  { value: "custom",label: "Custom range",  days: 0  },
 ] as const;
 
 const ROWS_PER_PAGE_OPTIONS = [10, 20, 50, 100] as const;
@@ -94,9 +95,10 @@ const item = { hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0 } };
 export function SensorPage({ sensorId }: { sensorId: string }) {
   const color = SENSOR_COLORS[sensorId] ?? "#0ea5e9";
 
-  const [quickRange, setQuickRange] = useState<string>("2d");
-  const [customFrom, setCustomFrom]  = useState("");
-  const [customTo,   setCustomTo]    = useState("");
+  const [quickRange, setQuickRange]   = useState<string>("2d");
+  const [customFrom, setCustomFrom]   = useState("");
+  const [customTo,   setCustomTo]     = useState("");
+  const [selectedDate, setSelectedDate] = useState("");
   const [showChart,  setShowChart]   = useState(true);
   const [selectedParam, setSelectedParam] = useState<string>("");
   const [rowsPerPage, setRowsPerPage] = useState(20);
@@ -117,20 +119,28 @@ export function SensorPage({ sensorId }: { sensorId: string }) {
     if (quickRange === "custom") {
       return { effectiveFrom: customFrom || undefined, effectiveTo: customTo || undefined };
     }
+    if (quickRange === "date") {
+      if (!selectedDate) return { effectiveFrom: undefined, effectiveTo: undefined };
+      return { effectiveFrom: `${selectedDate}T00:00`, effectiveTo: `${selectedDate}T23:59` };
+    }
     if (!latest?.timestamp) return { effectiveFrom: undefined, effectiveTo: undefined };
     const days = QUICK_RANGES.find((r) => r.value === quickRange)?.days ?? 2;
     const latestDate = new Date(latest.timestamp);
     const fromDate  = new Date(latestDate.getTime() - days * 86_400_000);
     const fmt = (d: Date) => d.toISOString().slice(0, 16);
     return { effectiveFrom: fmt(fromDate), effectiveTo: fmt(latestDate) };
-  }, [quickRange, customFrom, customTo, latest?.timestamp]);
+  }, [quickRange, customFrom, customTo, selectedDate, latest?.timestamp]);
 
   const queryParams = useMemo(() => ({
     from: effectiveFrom,
     to:   effectiveTo,
   }), [effectiveFrom, effectiveTo]);
 
-  const dataEnabled = !!sensorId && (quickRange === "custom" || !loadingLatest);
+  const dataEnabled = !!sensorId && (
+    quickRange === "custom" ||
+    (quickRange === "date" && !!selectedDate) ||
+    (!["custom", "date"].includes(quickRange) && !loadingLatest)
+  );
 
   const { data: sensorData, isLoading: loadingData } = useGetSensorData(
     sensorId,
@@ -161,6 +171,10 @@ export function SensorPage({ sensorId }: { sensorId: string }) {
 
   const rangeLabel = quickRange === "custom"
     ? "Custom range"
+    : quickRange === "date"
+    ? selectedDate
+      ? new Date(`${selectedDate}T00:00`).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })
+      : "Select a date"
     : QUICK_RANGES.find((r) => r.value === quickRange)?.label ?? "";
 
   function handleRangeChange(val: string) { setQuickRange(val); setPage(0); }
@@ -239,9 +253,9 @@ export function SensorPage({ sensorId }: { sensorId: string }) {
                         >
                           <Icon className="h-5 w-5" />
                         </div>
-                        {/* Parameter name — centered, bold, colored */}
+                        {/* Parameter name — centered, bold, colored, medium-large */}
                         <div
-                          className="text-xs font-bold leading-snug mb-2 px-1 line-clamp-2"
+                          className="text-sm font-bold leading-snug mb-2 px-1 line-clamp-2 text-center"
                           style={{ color: iconColor }}
                         >
                           {param.label}
@@ -284,6 +298,17 @@ export function SensorPage({ sensorId }: { sensorId: string }) {
                 ))}
               </SelectContent>
             </Select>
+            {quickRange === "date" && (
+              <div>
+                <label className="text-xs text-muted-foreground font-medium block mb-1">Select Date</label>
+                <input
+                  type="date"
+                  className="text-sm border border-input rounded-md px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-ring"
+                  value={selectedDate}
+                  onChange={(e) => { setSelectedDate(e.target.value); setPage(0); }}
+                />
+              </div>
+            )}
             {quickRange === "custom" && (
               <div className="flex flex-wrap gap-3 items-end">
                 <div>
