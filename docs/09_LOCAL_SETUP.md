@@ -1,90 +1,159 @@
 # 09 — Local Setup Guide (Windows)
 
+This guide explains how to run the SQU Smart Weather Station Dashboard on any Windows PC.
+
 ## Requirements
 
-- **Node.js LTS** (v20 or later) — https://nodejs.org
-- **pnpm** — install after Node.js: `npm install -g pnpm`
-- **VS Code** (recommended editor) — https://code.visualstudio.com
-- A modern browser (Chrome, Edge, Firefox)
+- Git
+- Node.js LTS v20 or newer
+- pnpm
+- VS Code
+- Chrome or Edge
+- Python, only if running the DBD-to-CSV updater
+- dump_dbd.exe, only if converting DT80W DBD files to CSV
 
-## Steps
+Install pnpm after Node.js:
 
-### 1. Download the Project
-
-Download the ZIP from Replit (Files panel → right-click root → Download as zip) or clone from GitHub.
-
-Extract to a folder, e.g., `C:\Projects\weather-dashboard\`
-
-### 2. Open in VS Code
-
-```
-code C:\Projects\weather-dashboard
+```bash
+npm install -g pnpm
 ```
 
-Or open VS Code → File → Open Folder → select the project folder.
+## 1. Clone the Project
 
-### 3. Install Dependencies
+```bash
+git clone https://github.com/mo7ammed-saleh/SQU_smart_weather_station.git
+cd SQU_smart_weather_station
+```
 
-Open the terminal in VS Code (Ctrl+`) and run:
+## 2. Install Dependencies
 
 ```bash
 pnpm install
 ```
 
-This installs all packages for both the frontend and backend.
+Optional check:
 
-### 4. Place CSV Files
-
-Copy your real sensor CSV files into:
-
-```
-artifacts/api-server/data/csv/
+```bash
+pnpm run typecheck
 ```
 
-Files must be named exactly:
-- `AQT560_DATA.CSV`
-- `WS500_DATA.CSV`
-- `SMP10_DATA.CSV`
-- `DR30_DATA.CSV`
+## 3. Create Environment File
 
-### 5. Run the Backend
+```bash
+copy .env.example .env
+```
 
-In one terminal:
+Safe default when the DT80W is not connected:
+
+```env
+DT80_ENABLED=false
+DT80_MODE=dry-run
+```
+
+When the logger is connected and tested:
+
+```env
+DT80_ENABLED=true
+DT80_MODE=tcp
+DT80_IP=192.168.5.50
+DT80_PORT=7700
+```
+
+## 4. Place CSV Files
+
+Final CSV folder:
+
+```text
+DB/CSV_Files/
+```
+
+Required files:
+
+```text
+AQT560_DATA.CSV
+WS500_DATA.CSV
+SMP10_DATA.CSV
+DR30_DATA.CSV
+```
+
+The dashboard reads only this folder. Do not use old CSV folders.
+
+## 5. Run Backend
+
+Terminal 1:
 
 ```bash
 pnpm --filter @workspace/api-server run dev
 ```
 
-The API server starts on port `8080` (or the PORT set in environment).
+Expected backend port: `8080`.
 
-### 6. Run the Frontend
+## 6. Run Frontend
 
-In a second terminal:
+Terminal 2:
 
 ```bash
+cd SQU_smart_weather_station
 pnpm --filter @workspace/weather-dashboard run dev
 ```
 
-The dashboard starts on port `20300` (or another available port).
+Expected frontend URL:
 
-### 7. Open in Browser
+```text
+http://localhost:20300
+```
 
-Navigate to: `http://localhost:20300`
+## 7. Login
 
-### 8. Login
+Default login:
 
-Default credentials:
-- **Username:** `admin`
-- **Password:** `admin123`
+```text
+admin / admin123
+```
 
-Change these from the Settings page after first login.
+Change password from Settings after first login.
 
-## Troubleshooting
+## 8. Python Auto Update Workflow
 
-| Problem | Solution |
-|---------|----------|
-| `pnpm: command not found` | Run `npm install -g pnpm` first |
-| Port already in use | Change PORT in `.env` or stop the conflicting process |
-| CSV not showing | Check filenames match exactly (case-sensitive on Linux) |
-| Login fails | Ensure API server is running on port 8080 |
-| No data in charts | Verify CSV files have the correct timestamp format |
+The dashboard does not read DBD files directly.
+
+Recommended update process:
+
+1. DT80W logs readings as DBD files.
+2. Python connects to the DT80W FTP server.
+3. Python downloads DBD files.
+4. Python converts DBD files to CSV using `dump_dbd.exe`.
+5. Python saves or replaces CSV files in `DB/CSV_Files/`.
+6. A batch file runs the Python script.
+7. Windows Task Scheduler runs the batch file automatically.
+8. Refresh the dashboard to see the updated CSV data.
+
+## 9. Troubleshooting
+
+| Problem | Fix |
+|---|---|
+| pnpm not found | Run `npm install -g pnpm` |
+| Login connection error | Start the backend terminal first |
+| No data appears | Confirm CSV files are in `DB/CSV_Files/` with exact filenames |
+| Row count looks wrong | Check the CSV row count and refresh the dashboard |
+| Logger connection disabled | Normal when `DT80_ENABLED=false` |
+| Logger connection failed | Check logger IP, port, network, and `.env` |
+| Excel export fails | Confirm backend is running and CSV files exist |
+
+## Quick Commands
+
+```bash
+git clone https://github.com/mo7ammed-saleh/SQU_smart_weather_station.git
+cd SQU_smart_weather_station
+npm install -g pnpm
+pnpm install
+copy .env.example .env
+pnpm --filter @workspace/api-server run dev
+```
+
+Second terminal:
+
+```bash
+cd SQU_smart_weather_station
+pnpm --filter @workspace/weather-dashboard run dev
+```
