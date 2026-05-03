@@ -1,151 +1,256 @@
-# Smart Weather Station Dashboard
+# SQU Smart Weather Station Dashboard
 
 **Sultan Qaboos University — iLab Marine**
 
-A full-stack environmental monitoring dashboard for the SQU Smart Weather Station. Built with React + Vite (frontend) and Express (backend), using real CSV sensor data as the single source of truth.
+A full-stack dashboard for monitoring the SQU Smart Weather Station. The system uses a React/Vite frontend and an Express/Node.js backend. The dashboard reads real sensor CSV files, displays latest readings, charts, data tables, date filters, and exports Excel reports.
 
-## Updating Dashboard Data
+---
 
-To replace the CSV data with new sensor readings:
+## Final System Workflow
 
-1. Replace the CSV files inside `DB/CSV_Files/`
-2. Keep the same file names: `AQT560_DATA.CSV`, `WS500_DATA.CSV`, `SMP10_DATA.CSV`, `DR30_DATA.CSV`
-3. Restart the API Server workflow
-4. Refresh the dashboard — all row counts, charts, and tables update automatically
-5. No fake data is generated at any point
+```text
+DT80W Data Logger
+  ↓ logs sensor data as DBD files
+Python FTP Script
+  ↓ downloads DBD files from the DT80W
+Python + dump_dbd.exe
+  ↓ converts DBD files to CSV
+DB/CSV_Files/
+  ↓ dashboard reads CSV files
+Web Dashboard
+```
+
+The Python updater and Windows Task Scheduler are separate from the dashboard app. The dashboard reads the final CSV files only.
+
+---
+
+## Important Data Rule
+
+CSV files are the **single source of truth** for dashboard readings.
+
+- Do not generate fake CSV rows.
+- Do not overwrite real CSV files unless replacing them with new DT80W-converted CSV files.
+- The dashboard reads the current files from disk.
+- When the Python script replaces CSV files, refresh the dashboard to see updated data.
+
+Final CSV folder:
+
+```text
+DB/CSV_Files/
+```
+
+Required filenames:
+
+```text
+AQT560_DATA.CSV
+WS500_DATA.CSV
+SMP10_DATA.CSV
+DR30_DATA.CSV
+```
 
 ---
 
 ## Features
 
-- **4 Live Sensor Pages** — AQT560 Air Quality, WS500 Weather, SMP10 Pyranometer, DR30 Pyrheliometer
-- **Interactive Charts** — Recharts line charts with dynamic column selection
-- **Date/Time Filtering** — Filter all data by date and time range
-- **Excel Export** — Export one or all sensors to `.xlsx` with optional date filter
-- **Logger Interval Control** — Set the sampling interval (15M to 1D)
-- **Settings Page** — Change username and password
-- **Blue/Cyan Glassmorphism UI** — Professional dashboard design
-- **Protected Routes** — Login required for all pages
+- Login-protected dashboard.
+- Home dashboard with four sensor overview cards.
+- Sensor pages for AQT560, WS500, SMP10, and DR30.
+- Latest reading cards.
+- Dynamic CSV headers.
+- Date/range filtering, including Today and Latest Available Day.
+- Chart parameter selection.
+- Data table with pagination and rows-per-page control.
+- Excel export:
+  - Top sensor export downloads all data for that sensor.
+  - Data Table export downloads only selected/filtered rows.
+  - Home export can export one sensor or all sensors.
+- Settings page for username/password changes.
+- Data logger interval control.
+- DT80W connection test.
+- Direct DT80W interval apply when enabled and the logger is reachable.
 
 ---
 
 ## Default Login
 
-| Username | Password |
-|----------|----------|
-| admin | admin123 |
+Credentials are stored in:
 
-**Change your password from Settings after first login.**
-
----
-
-## Quick Start (Replit)
-
-Both workflows start automatically. Open the preview pane to see the dashboard.
-
----
-
-## Run Locally (Windows)
-
-See [`setup-local.md`](./setup-local.md) for full instructions.
-
-```bash
-pnpm install
-pnpm --filter @workspace/api-server run dev    # Terminal 1
-pnpm --filter @workspace/weather-dashboard run dev  # Terminal 2
+```text
+artifacts/api-server/data/users.json
 ```
 
-Open: `http://localhost:20300`
+Default credentials:
+
+| Username | Password |
+|---|---|
+| admin | admin123 |
+
+Change the password from **Settings** after first login.
 
 ---
 
 ## Folder Structure
 
-```
-artifacts/api-server/     → Express backend
-artifacts/weather-dashboard/  → React frontend
-docs/                     → Full documentation
-setup-local.md            → Windows local setup
-setup-production.md       → Production deployment
-.env.example              → Environment variable template
+```text
+SQU_smart_weather_station/
+├── README.md
+├── package.json
+├── pnpm-workspace.yaml
+├── pnpm-lock.yaml
+├── .env.example
+├── .gitignore
+├── .replit
+├── setup-local.md
+├── setup-production.md
+├── DB/
+│   └── CSV_Files/
+│       ├── AQT560_DATA.CSV
+│       ├── WS500_DATA.CSV
+│       ├── SMP10_DATA.CSV
+│       └── DR30_DATA.CSV
+├── artifacts/
+│   ├── api-server/          # Express backend
+│   └── weather-dashboard/   # React/Vite frontend
+├── lib/                     # OpenAPI spec and generated client
+├── docs/                    # Full project documentation
+└── scripts/                 # Utility scripts
 ```
 
 ---
 
-## CSV Data
+## Run Locally on Windows
 
-Place real sensor CSV files in `DB/CSV_Files/` (project root):
+See [`setup-local.md`](./setup-local.md) for full instructions.
 
-- `AQT560_DATA.CSV`
-- `WS500_DATA.CSV`
-- `SMP10_DATA.CSV`
-- `DR30_DATA.CSV`
+Quick version:
 
-The backend reads from this folder on every request. Replacing files and refreshing the dashboard shows new data immediately. The folder path can be overridden with the `CSV_DATA_DIR` environment variable (resolved relative to the project root).
+```bash
+git clone https://github.com/mo7ammed-saleh/SQU_smart_weather_station.git
+cd SQU_smart_weather_station
+npm install -g pnpm
+pnpm install
+copy .env.example .env
+```
 
-**Do not generate or simulate CSV rows. Use only real sensor data.**
+Put the four CSV files in:
+
+```text
+DB/CSV_Files/
+```
+
+Terminal 1:
+
+```bash
+pnpm --filter @workspace/api-server run dev
+```
+
+Terminal 2:
+
+```bash
+pnpm --filter @workspace/weather-dashboard run dev
+```
+
+Open:
+
+```text
+http://localhost:20300
+```
 
 ---
 
-## Publishing to GitHub
+## Python Auto Update Workflow
 
-To push the dashboard code to GitHub:
+Your Python workflow should:
 
-1. Create a GitHub Personal Access Token:
-   - Go to **https://github.com/settings/tokens**
-   - Click **"Generate new token (classic)"**
-   - Select the **`repo`** scope
-   - Copy the token (starts with `ghp_`)
-   - **For fine-grained tokens**: go to Settings → Tokens → edit the token → add the target repository under "Repository access" → set **Contents: Read and write**
+1. Connect to the DT80W FTP server.
+2. Download the DBD files.
+3. Convert DBD to CSV using `dump_dbd.exe`.
+4. Save/replace these files inside `DB/CSV_Files/`:
+   - `AQT560_DATA.CSV`
+   - `WS500_DATA.CSV`
+   - `SMP10_DATA.CSV`
+   - `DR30_DATA.CSV`
+5. Use a `.bat` file and Windows Task Scheduler to run the Python script automatically, for example every 30 minutes.
+6. Refresh the dashboard to read the latest CSV files.
 
-2. Store the token as a Replit Secret named **`GITHUB_TOKEN`**
+---
 
-3. Run the publish script:
-   ```bash
-   bash scripts/publish-to-github.sh https://github.com/YOUR_USERNAME/YOUR_REPO.git
-   ```
+## DT80W Interval Control
 
-The `GITHUB_TOKEN` secret is never committed to the repository.
+The website includes DT80W direct interval control.
+
+Safe default in `.env`:
+
+```env
+DT80_ENABLED=false
+DT80_MODE=dry-run
+```
+
+When the DT80W is physically connected and the correct command interface/port is confirmed, configure:
+
+```env
+DT80_ENABLED=true
+DT80_MODE=tcp
+DT80_IP=192.168.5.50
+DT80_PORT=7700
+```
+
+Workflow:
+
+1. User selects a logging interval.
+2. User clicks **Test DT80W Connection**.
+3. If the connection succeeds, user clicks **Apply Interval to Logger**.
+4. The backend sends the interval update to the DT80W.
+
+Important safety rules:
+
+- Do not use `DELALLJOBS` for interval changes.
+- Do not delete logger data.
+- Do not apply full job updates unless intentionally enabled and tested.
+
+---
+
+## Deployment Notes
+
+GitHub is used for source-code storage. GitHub Pages is **not suitable** for this project because the dashboard needs an Express backend.
+
+Use one of these options:
+
+- Replit Deployment.
+- Local PC/server inside the organization network.
+- VPS/cloud server with Node.js and optional Nginx/Caddy.
+
+See [`setup-production.md`](./setup-production.md).
 
 ---
 
 ## Documentation
 
 | File | Description |
-|------|-------------|
-| `docs/00_PROJECT_OVERVIEW.md` | What the system is and does |
+|---|---|
+| `docs/00_PROJECT_OVERVIEW.md` | Project purpose and workflow |
 | `docs/01_SYSTEM_ARCHITECTURE.md` | Frontend/backend/data architecture |
-| `docs/02_FOLDER_STRUCTURE.md` | Every important folder and file |
-| `docs/03_BACKEND_API.md` | All API endpoints with examples |
-| `docs/04_FRONTEND_UI.md` | Pages and components guide |
-| `docs/05_CSV_DATA_FORMAT.md` | CSV format rules and data flow |
-| `docs/06_AUTH_AND_SETTINGS.md` | Login and settings system |
-| `docs/07_EXCEL_EXPORT.md` | Export feature details |
-| `docs/08_DT80W_DATA_FLOW.md` | DataTaker DT80W integration plan |
-| `docs/09_LOCAL_SETUP.md` | Run locally on Windows |
-| `docs/10_PRODUCTION_DEPLOYMENT.md` | Deploy to production |
-| `docs/11_AI_AGENT_GUIDE.md` | Guide for AI coding tools |
-| `docs/12_DATABASE_PLAN.md` | Future database migration plan |
+| `docs/02_FOLDER_STRUCTURE.md` | Folder structure |
+| `docs/03_BACKEND_API.md` | API endpoints |
+| `docs/04_FRONTEND_UI.md` | UI/pages guide |
+| `docs/05_CSV_DATA_FORMAT.md` | CSV rules and format |
+| `docs/06_AUTH_AND_SETTINGS.md` | Login/settings |
+| `docs/07_EXCEL_EXPORT.md` | Excel export behavior |
+| `docs/08_DT80W_DATA_FLOW.md` | DT80W → Python → CSV → Dashboard flow |
+| `docs/09_LOCAL_SETUP.md` | Local Windows setup |
+| `docs/10_PRODUCTION_DEPLOYMENT.md` | Production deployment |
+| `docs/11_AI_AGENT_GUIDE.md` | Rules for future AI/developers |
+| `docs/12_DATABASE_PLAN.md` | Future database plan |
 
 ---
 
 ## Technology Stack
 
 | Layer | Technology |
-|-------|-----------|
-| Frontend | React 18, Vite, TypeScript, Tailwind CSS |
-| Components | shadcn/ui, Recharts, Framer Motion |
-| Backend | Express 5, Node.js, TypeScript |
-| Data | CSV files (source of truth) |
-| Auth | JSON file (users.json) |
+|---|---|
+| Frontend | React, Vite, TypeScript, Tailwind CSS |
+| UI | shadcn/ui, Recharts, Framer Motion |
+| Backend | Express, Node.js, TypeScript |
+| Data | CSV files in `DB/CSV_Files/` |
+| Auth | JSON file (`users.json`) |
 | Export | ExcelJS |
-
----
-
-## Future Roadmap
-
-- [ ] Connect Python script for automatic DT80W → CSV conversion
-- [ ] Send interval commands to DT80W via TCP
-- [ ] Migrate from JSON auth to database with hashed passwords
-- [ ] Add viewer role (read-only access)
-- [ ] Add email alerts for sensor anomalies
