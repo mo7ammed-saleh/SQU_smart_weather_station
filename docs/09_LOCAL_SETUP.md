@@ -78,32 +78,34 @@ DR30_DATA.CSV
 
 The dashboard reads only this folder. Do not use old CSV folders.
 
-## 5. Run Backend
-
-Terminal 1:
+## 5. Run the Full App
 
 ```bash
-pnpm --filter @workspace/api-server run dev
+pnpm.cmd run dev
 ```
 
-Expected backend port: `8080`.
-
-## 6. Run Frontend
-
-Terminal 2:
-
-```bash
-cd SQU_smart_weather_station
-pnpm --filter @workspace/weather-dashboard run dev
-```
-
-Expected frontend URL:
+Then open:
 
 ```text
 http://localhost:20300
 ```
 
-## 7. Login
+Local ports:
+
+```text
+Frontend dashboard: http://localhost:20300
+Backend API: http://localhost:8080
+```
+
+During local development, the Vite dev server forwards frontend `/api` requests to the backend on `http://localhost:8080`.
+
+Normal API request logs are hidden by default so the terminal stays quiet. Set this only while debugging request traffic:
+
+```env
+HTTP_LOGS=true
+```
+
+## 6. Login
 
 Default login:
 
@@ -112,6 +114,29 @@ admin / admin123
 ```
 
 Change password from Settings after first login.
+
+## 7. Alternative Troubleshooting Startup
+
+Use this only if you need to isolate backend or frontend startup problems.
+
+Backend terminal:
+
+```bash
+pnpm --filter @workspace/api-server run dev
+```
+
+Frontend terminal:
+
+```bash
+cd SQU_smart_weather_station
+pnpm --filter @workspace/weather-dashboard run dev
+```
+
+Then open:
+
+```text
+http://localhost:20300
+```
 
 ## 8. Python Auto Update Workflow
 
@@ -133,12 +158,13 @@ Recommended update process:
 | Problem | Fix |
 |---|---|
 | pnpm not found | Run `npm install -g pnpm` |
-| Login connection error | Start the backend terminal first |
+| Login connection error | Confirm the backend process is running |
 | No data appears | Confirm CSV files are in `DB/CSV_Files/` with exact filenames |
 | Row count looks wrong | Check the CSV row count and refresh the dashboard |
 | Logger connection disabled | Normal when `DT80_ENABLED=false` |
 | Logger connection failed | Check logger IP, port, network, and `.env` |
 | Excel export fails | Confirm backend is running and CSV files exist |
+| Need API request logs | Set `HTTP_LOGS=true` in `.env`, restart the app, then set it back to `false` after debugging |
 
 ## Quick Commands
 
@@ -148,12 +174,5 @@ cd SQU_smart_weather_station
 npm install -g pnpm
 pnpm install
 copy .env.example .env
-pnpm --filter @workspace/api-server run dev
-```
-
-Second terminal:
-
-```bash
-cd SQU_smart_weather_station
-pnpm --filter @workspace/weather-dashboard run dev
+pnpm.cmd run dev
 ```

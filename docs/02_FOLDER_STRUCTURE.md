@@ -11,7 +11,6 @@ SQU_smart_weather_station/
 ├── .env.example
 ├── .gitignore
 ├── .replit
-├── setup-local.md
 ├── setup-production.md
 ├── DB/
 │   └── CSV_Files/
@@ -60,6 +59,7 @@ SQU_smart_weather_station/
 │   └── api-client-react/
 ├── docs/
 └── scripts/
+    └── windows/
 ```
 
 ## Key Rules

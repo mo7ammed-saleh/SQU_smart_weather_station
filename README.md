@@ -100,7 +100,6 @@ SQU_smart_weather_station/
 ├── .env.example
 ├── .gitignore
 ├── .replit
-├── setup-local.md
 ├── setup-production.md
 ├── DB/
 │   └── CSV_Files/
@@ -113,48 +112,15 @@ SQU_smart_weather_station/
 │   └── weather-dashboard/   # React/Vite frontend
 ├── lib/                     # OpenAPI spec and generated client
 ├── docs/                    # Full project documentation
-└── scripts/                 # Utility scripts
+└── scripts/                 # Utility scripts and Windows auto-run files
 ```
 
 ---
 
 ## Run Locally on Windows
 
-See [`setup-local.md`](./setup-local.md) for full instructions.
-
-Quick version:
-
-```bash
-git clone https://github.com/mo7ammed-saleh/SQU_smart_weather_station.git
-cd SQU_smart_weather_station
-npm install -g pnpm
-pnpm install
-copy .env.example .env
-```
-
-Put the four CSV files in:
-
-```text
-DB/CSV_Files/
-```
-
-Terminal 1:
-
-```bash
-pnpm --filter @workspace/api-server run dev
-```
-
-Terminal 2:
-
-```bash
-pnpm --filter @workspace/weather-dashboard run dev
-```
-
-Open:
-
-```text
-http://localhost:20300
-```
+See [`docs/09_LOCAL_SETUP.md`](./docs/09_LOCAL_SETUP.md) for the full local setup guide.
+See [`docs/13_WINDOWS_AUTO_RUN.md`](./docs/13_WINDOWS_AUTO_RUN.md) for automatic Windows startup.
 
 ---
 
@@ -241,6 +207,7 @@ See [`setup-production.md`](./setup-production.md).
 | `docs/10_PRODUCTION_DEPLOYMENT.md` | Production deployment |
 | `docs/11_AI_AGENT_GUIDE.md` | Rules for future AI/developers |
 | `docs/12_DATABASE_PLAN.md` | Future database plan |
+| `docs/13_WINDOWS_AUTO_RUN.md` | Windows auto-run setup |
 
 ---
 

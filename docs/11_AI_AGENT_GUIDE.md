@@ -119,4 +119,6 @@ Rules:
 
 ## Local Setup Reminder
 
-Use `setup-local.md` for Windows installation. GitHub Pages is not suitable because this project requires an Express backend.
+Use `docs/09_LOCAL_SETUP.md` for Windows installation. Use `docs/13_WINDOWS_AUTO_RUN.md` for Task Scheduler startup.
+
+Normal backend request logs are hidden by default with `HTTP_LOGS=false`. Keep this default for local use and set `HTTP_LOGS=true` only when debugging API request traffic. GitHub Pages is not suitable because this project requires an Express backend.
