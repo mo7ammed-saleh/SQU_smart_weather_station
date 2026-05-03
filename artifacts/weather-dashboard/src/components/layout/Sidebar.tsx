@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Cloud, Sun, Wind, Home, X, LogOut } from "lucide-react";
+import { Cloud, Sun, Wind, Home, X, LogOut, Settings } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 
@@ -17,16 +17,13 @@ export function Sidebar({ mobileOpen, setMobileOpen }: { mobileOpen: boolean; se
   const navItems = [
     { href: "/", label: "Home Dashboard", icon: Home },
     ...SENSORS.map((s) => ({ href: `/sensors/${s.id}`, label: s.name, icon: s.icon })),
+    { href: "/settings", label: "Settings", icon: Settings },
   ];
 
   return (
     <>
-      {/* Mobile overlay */}
       {mobileOpen && (
-        <div
-          className="fixed inset-0 z-40 bg-black/50 lg:hidden"
-          onClick={() => setMobileOpen(false)}
-        />
+        <div className="fixed inset-0 z-40 bg-black/50 lg:hidden" onClick={() => setMobileOpen(false)} />
       )}
 
       <aside
@@ -34,19 +31,16 @@ export function Sidebar({ mobileOpen, setMobileOpen }: { mobileOpen: boolean; se
           transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 lg:flex flex-shrink-0
           ${mobileOpen ? "translate-x-0" : "-translate-x-full"}`}
       >
-        {/* Sidebar Header — centered "Navigation" title */}
+        {/* Header */}
         <div
           className="flex h-20 items-center justify-between px-4 flex-shrink-0"
           style={{ background: "linear-gradient(135deg, #0c4a6e, #0e7490)" }}
         >
           <div className="flex-1 flex items-center justify-center">
-            <span className="text-white font-bold text-lg tracking-wide uppercase">
-              Navigation
-            </span>
+            <span className="text-white font-bold text-lg tracking-wide uppercase">Navigation</span>
           </div>
           <Button
-            variant="ghost"
-            size="icon"
+            variant="ghost" size="icon"
             onClick={() => setMobileOpen(false)}
             className="lg:hidden text-white/80 hover:text-white hover:bg-white/15 flex-shrink-0"
           >
@@ -54,7 +48,7 @@ export function Sidebar({ mobileOpen, setMobileOpen }: { mobileOpen: boolean; se
           </Button>
         </div>
 
-        {/* Navigation links */}
+        {/* Nav links */}
         <nav className="flex-1 p-4 space-y-1.5 overflow-y-auto">
           {navItems.map((item) => {
             const isActive = location === item.href;
@@ -69,16 +63,14 @@ export function Sidebar({ mobileOpen, setMobileOpen }: { mobileOpen: boolean; se
                 >
                   <item.icon className="h-4 w-4 flex-shrink-0" />
                   <span className="font-medium text-sm">{item.label}</span>
-                  {isActive && (
-                    <span className="ml-auto h-1.5 w-1.5 rounded-full bg-cyan-300" />
-                  )}
+                  {isActive && <span className="ml-auto h-1.5 w-1.5 rounded-full bg-cyan-300" />}
                 </div>
               </Link>
             );
           })}
         </nav>
 
-        {/* Bottom: Logout button — always visible */}
+        {/* Logout at bottom */}
         <div className="flex-shrink-0 px-4 py-4 border-t border-sidebar-border">
           <button
             onClick={logout}

@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { Login } from "@/pages/Login";
 import { Home } from "@/pages/Home";
 import { SensorPage } from "@/pages/SensorPage";
+import { Settings } from "@/pages/Settings";
 import NotFound from "@/pages/not-found";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { useAuth } from "@/lib/auth";
@@ -35,6 +36,9 @@ function Router() {
         {(params) => (
           <RequireAuth><SensorPage sensorId={params.sensorId ?? ""} /></RequireAuth>
         )}
+      </Route>
+      <Route path="/settings">
+        <RequireAuth><Settings /></RequireAuth>
       </Route>
       <Route component={NotFound} />
     </Switch>

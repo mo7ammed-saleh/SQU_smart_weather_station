@@ -1,0 +1,428 @@
+Please add the following features and project organization updates. Keep the existing dashboard functionality and UI style.
+
+1. NAVIGATION PANEL: ADD SETTINGS PAGE
+
+Add a new item in the left navigation sidebar:
+
+Settings
+
+Route:
+ /settings
+
+The Settings page should include:
+
+A. User Account Settings
+- Show current username
+- Input to change username
+- Input for current password
+- Input for new password
+- Input to confirm new password
+- Save button
+
+Validation:
+- Current password must be correct before changing password.
+- New password and confirm password must match.
+- Password must not be empty.
+- Username must not be empty.
+- Show success/error message.
+
+For now, store user credentials locally in a backend JSON file:
+
+backend/data/users.json
+
+Example structure:
+
+{
+  "users": [
+    {
+      "id": 1,
+      "username": "admin",
+      "password": "admin123",
+      "role": "admin",
+      "updatedAt": "2026-05-02T00:00:00.000Z"
+    }
+  ]
+}
+
+Important:
+- Login must use backend/data/users.json instead of hard-coded admin/admin123.
+- After username/password is changed, login must work with the new credentials.
+- Keep this simple for now. No database is required yet.
+- Add a clear note in documentation that this is local JSON authentication and can later be replaced with a real database.
+
+Backend endpoints:
+POST /api/auth/login
+GET /api/settings/user
+PUT /api/settings/user
+
+Frontend:
+- Add Settings page.
+- Add Settings link in sidebar.
+- Add clean form cards.
+- Keep blue/cyan professional dashboard style.
+
+
+2. ARRANGE PROJECT FOLDERS CLEANLY
+
+Please organize the project folder structure clearly.
+
+Target structure:
+
+weather-station-dashboard/
+├── README.md
+├── package.json
+├── .env.example
+├── setup-local.md
+├── setup-production.md
+├── docs/
+│   ├── 00_PROJECT_OVERVIEW.md
+│   ├── 01_SYSTEM_ARCHITECTURE.md
+│   ├── 02_FOLDER_STRUCTURE.md
+│   ├── 03_BACKEND_API.md
+│   ├── 04_FRONTEND_UI.md
+│   ├── 05_CSV_DATA_FORMAT.md
+│   ├── 06_AUTH_AND_SETTINGS.md
+│   ├── 07_EXCEL_EXPORT.md
+│   ├── 08_DT80W_DATA_FLOW.md
+│   ├── 09_LOCAL_SETUP.md
+│   ├── 10_PRODUCTION_DEPLOYMENT.md
+│   ├── 11_AI_AGENT_GUIDE.md
+│   └── 12_DATABASE_PLAN.md
+├── backend/
+│   ├── server.js
+│   ├── routes/
+│   │   ├── auth.js
+│   │   ├── sensors.js
+│   │   ├── export.js
+│   │   ├── logger.js
+│   │   └── settings.js
+│   ├── services/
+│   │   ├── csvService.js
+│   │   ├── excelService.js
+│   │   ├── authService.js
+│   │   ├── userSettingsService.js
+│   │   └── loggerSettingsService.js
+│   ├── config/
+│   │   └── sensors.js
+│   └── data/
+│       ├── users.json
+│       ├── logger-settings.json
+│       └── csv/
+│           ├── AQT560_DATA.CSV
+│           ├── WS500_DATA.CSV
+│           ├── SMP10_DATA.CSV
+│           └── DR30_DATA.CSV
+└── frontend/
+    ├── public/
+    │   ├── company-logo.png
+    │   └── squ-logo.png
+    └── src/
+        ├── pages/
+        │   ├── Login.jsx
+        │   ├── Home.jsx
+        │   ├── SensorPage.jsx
+        │   └── Settings.jsx
+        ├── components/
+        ├── services/
+        └── config/
+
+
+3. ADD DOCS FOLDER WITH MARKDOWN FILES
+
+Create a docs folder with clear .md documentation files.
+
+The documentation must be useful for:
+- A normal user who wants to understand the system.
+- A developer who wants to maintain the system.
+- Any AI coding tool that needs to understand and continue the project later.
+
+Create these markdown files:
+
+docs/00_PROJECT_OVERVIEW.md
+Explain:
+- What the Smart Weather Station Dashboard is.
+- Purpose of the dashboard.
+- Four sensors.
+- CSV-based data flow.
+- Excel export.
+- Settings page.
+- Future DT80W integration.
+
+docs/01_SYSTEM_ARCHITECTURE.md
+Explain:
+- Frontend React/Vite.
+- Backend Express.
+- CSV files as source of truth.
+- JSON files for settings/users.
+- API flow.
+- Export flow.
+
+docs/02_FOLDER_STRUCTURE.md
+Explain every important folder and file.
+
+docs/03_BACKEND_API.md
+Document all endpoints:
+- Auth
+- Sensors
+- Export
+- Logger interval
+- Settings
+
+For each endpoint include:
+- Method
+- URL
+- Purpose
+- Request example
+- Response example
+
+docs/04_FRONTEND_UI.md
+Explain pages and components:
+- Login
+- Home
+- Sensor pages
+- Settings
+- Sidebar
+- Header
+- Footer
+- Excel export panel
+- Interval control
+
+docs/05_CSV_DATA_FORMAT.md
+Explain:
+- CSV files are source of truth.
+- Do not generate fake rows.
+- Timestamp column.
+- Sensor CSV file names.
+- How to replace CSV files with real data.
+- Expected date/time format.
+- How dynamic headers work.
+
+docs/06_AUTH_AND_SETTINGS.md
+Explain:
+- Login credentials are stored in backend/data/users.json.
+- How to change username/password from Settings page.
+- Current simple JSON authentication.
+- Future improvement: real database and hashed passwords.
+
+docs/07_EXCEL_EXPORT.md
+Explain:
+- How one-sensor export works.
+- How all-sensors export works.
+- Date/time filtering.
+- Excel workbook sheets.
+
+docs/08_DT80W_DATA_FLOW.md
+Explain:
+- DataTaker DT80W logs DBD files.
+- Python script downloads DBD by FTP.
+- dump_dbd converts DBD to CSV.
+- Dashboard reads CSV files.
+- Later backend can trigger Python script.
+- Later interval control can send commands to DT80W.
+
+docs/09_LOCAL_SETUP.md
+Explain how to run on any Windows PC locally:
+- Install Node.js
+- Download project
+- Install dependencies
+- Add CSV files
+- Run dev server
+- Login
+- Troubleshooting
+
+docs/10_PRODUCTION_DEPLOYMENT.md
+Explain global/production setup:
+- Environment variables
+- Build frontend
+- Run backend
+- Hosting options
+- Reverse proxy note
+- Security notes
+- Backups for CSV/users/settings files
+
+docs/11_AI_AGENT_GUIDE.md
+This file is for future AI tools.
+Include:
+- Project purpose
+- Main rules
+- Do not generate fake CSV data
+- Do not overwrite real CSV files
+- CSV headers are dynamic
+- Keep sidebar on left
+- Keep Smart Weather Station branding
+- Where to add new sensors
+- Where to add future DT80W integration
+
+docs/12_DATABASE_PLAN.md
+This file should contain the database plan for the future.
+
+Include:
+- Current system uses CSV + JSON files.
+- Future database can be SQLite or PostgreSQL.
+- Suggested tables:
+  users
+  sensors
+  sensor_readings
+  logger_settings
+  export_logs
+  system_settings
+
+For each table, include suggested columns.
+
+Example:
+
+users:
+- id
+- username
+- password_hash
+- role
+- created_at
+- updated_at
+
+sensors:
+- id
+- sensor_key
+- display_name
+- csv_file
+- description
+- active
+
+sensor_readings:
+- id
+- sensor_id
+- timestamp
+- parameter_key
+- parameter_label
+- value
+- unit
+
+logger_settings:
+- id
+- interval_label
+- interval_code
+- updated_at
+- updated_by
+
+export_logs:
+- id
+- sensor_key
+- from_datetime
+- to_datetime
+- file_name
+- created_at
+
+system_settings:
+- id
+- setting_key
+- setting_value
+- updated_at
+
+
+4. ADD LOCAL AND GLOBAL SETUP FILES
+
+Create these two files in the project root:
+
+setup-local.md
+Purpose:
+Guide the user to run the dashboard locally on any Windows PC.
+
+Include:
+- Requirements:
+  - Node.js LTS
+  - npm
+  - VS Code
+  - Browser
+- Steps:
+  1. Download or clone project.
+  2. Open folder in VS Code.
+  3. Install dependencies.
+  4. Place real CSV files in backend/data/csv.
+  5. Run the project.
+  6. Open browser.
+  7. Login.
+- Include example commands.
+
+setup-production.md
+Purpose:
+Guide the user to run the system globally/online.
+
+Include:
+- Build frontend.
+- Start backend.
+- Use environment variables.
+- Keep CSV folder persistent.
+- Keep users.json and logger-settings.json persistent.
+- Add security notes:
+  - Change default password.
+  - Use HTTPS.
+  - Do not expose CSV folder directly.
+  - Use database and password hashing in future.
+- Mention possible deployment:
+  - Replit Deployments
+  - VPS
+  - Local server inside organization network
+  - Windows PC with Node.js and scheduled Python CSV updater
+
+
+5. ADD .env.example
+
+Create:
+
+.env.example
+
+Include:
+
+PORT=8080
+NODE_ENV=development
+CSV_DATA_DIR=backend/data/csv
+USERS_FILE=backend/data/users.json
+LOGGER_SETTINGS_FILE=backend/data/logger-settings.json
+DEFAULT_USERNAME=admin
+DEFAULT_PASSWORD=admin123
+
+
+6. UPDATE README.md
+
+Update README.md to include:
+- Project name
+- Overview
+- Features
+- Login credentials
+- Folder structure
+- Run in Replit
+- Run locally
+- CSV replacement instructions
+- Settings page
+- Excel export
+- Logger interval control
+- Documentation list
+- Future database plan
+- Future DT80W integration
+
+
+7. IMPORTANT DATA RULES
+
+Do not generate fake CSV rows.
+Do not overwrite my uploaded CSV files.
+Use existing CSV files only.
+Dashboard row count must exactly match the CSV row count.
+Latest record must be the last row in the CSV.
+Excel export must export actual CSV rows only.
+
+
+8. TEST AFTER CHANGES
+
+After completing, test:
+- Login with current credentials.
+- Change username/password in Settings.
+- Logout.
+- Login with new credentials.
+- Sensor pages still load.
+- CSV row counts remain correct.
+- Excel export still works.
+- Logger interval still works.
+- Sidebar includes Settings.
+- Logout is at the bottom of sidebar.
+- No TypeScript errors.
+- No broken routes.
+- README and docs files exist.

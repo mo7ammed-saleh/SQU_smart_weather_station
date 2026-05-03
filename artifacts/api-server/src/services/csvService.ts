@@ -34,8 +34,7 @@ export function readCsv(csvFile: string): CsvRow[] {
   const result = Papa.parse<Record<string, string>>(content, {
     header: true,
     skipEmptyLines: true,
-    trimHeaders: false,
-  });
+  }) as { data: Record<string, string>[] };
 
   const rows: CsvRow[] = [];
 

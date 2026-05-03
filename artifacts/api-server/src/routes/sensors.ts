@@ -54,7 +54,7 @@ router.get("/summary", (_req: Request, res: Response) => {
 
 // GET /api/sensors/:sensorId/latest
 router.get("/:sensorId/latest", (req: Request, res: Response) => {
-  const sensor = getSensorById(req.params.sensorId);
+  const sensor = getSensorById(req.params["sensorId"] as string);
   if (!sensor) {
     res.status(404).json({ error: `Sensor '${req.params.sensorId}' not found` });
     return;
@@ -77,7 +77,7 @@ router.get("/:sensorId/latest", (req: Request, res: Response) => {
 
 // GET /api/sensors/:sensorId/data
 router.get("/:sensorId/data", (req: Request, res: Response) => {
-  const sensor = getSensorById(req.params.sensorId);
+  const sensor = getSensorById(req.params["sensorId"] as string);
   if (!sensor) {
     res.status(404).json({ error: `Sensor '${req.params.sensorId}' not found` });
     return;
@@ -107,7 +107,7 @@ router.get("/:sensorId/data", (req: Request, res: Response) => {
 
 // GET /api/sensors/:sensorId/parameters
 router.get("/:sensorId/parameters", (req: Request, res: Response) => {
-  const sensor = getSensorById(req.params.sensorId);
+  const sensor = getSensorById(req.params["sensorId"] as string);
   if (!sensor) {
     res.status(404).json({ error: `Sensor '${req.params.sensorId}' not found` });
     return;
