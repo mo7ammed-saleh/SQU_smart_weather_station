@@ -70,7 +70,7 @@ const ROWS_PER_PAGE_OPTIONS = [10, 20, 50, 100] as const;
 
 function formatTs(iso: string) {
   try {
-    return new Date(iso).toLocaleString("en-GB", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" });
+    return new Date(iso).toLocaleString("en-GB", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit", timeZone: "UTC" });
   } catch { return iso; }
 }
 
@@ -79,6 +79,7 @@ function formatFull(iso: string) {
     return new Date(iso).toLocaleString("en-GB", {
       day: "2-digit", month: "short", year: "numeric",
       hour: "2-digit", minute: "2-digit", second: "2-digit",
+      timeZone: "UTC",
     });
   } catch { return iso; }
 }

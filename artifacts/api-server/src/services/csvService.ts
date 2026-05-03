@@ -1,10 +1,10 @@
 import fs from "fs";
 import path from "path";
 import Papa from "papaparse";
-import { fileURLToPath } from "url";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const CSV_DIR = path.resolve(__dirname, "../data/csv");
+const CSV_DIR = process.env.CSV_DATA_DIR
+  ? path.resolve(process.env.CSV_DATA_DIR)
+  : path.resolve(process.cwd(), "../../DB/CSV_Files");
 
 export interface CsvRow {
   timestamp: string;
@@ -18,7 +18,7 @@ function parseTimestamp(raw: string): Date {
   const match = cleaned.match(/^(\d{2})\/(\d{2})\/(\d{4}),\s*(\d{2}):(\d{2})(?::(\d{2}))?$/);
   if (match) {
     const [, day, month, year, hour, min, sec = "00"] = match;
-    return new Date(`${year}-${month}-${day}T${hour}:${min}:${sec}`);
+    return new Date(`${year}-${month}-${day}T${hour}:${min}:${sec}Z`);
   }
   return new Date(cleaned);
 }
