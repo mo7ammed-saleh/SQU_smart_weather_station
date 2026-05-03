@@ -1,83 +1,184 @@
 # Production Deployment Guide
 
-Deploy the Smart Weather Station Dashboard for global or internal access.
+Deploy the SQU Smart Weather Station Dashboard for internal or online access.
 
-## Option 1: Replit Deployments (Recommended)
+## Important Note About GitHub Pages
 
-1. Open the project in Replit
-2. Click the **Deploy** button (top right)
-3. Choose **Autoscale** or **Reserved VM**
-4. Your app is live at `https://your-app.replit.app`
+GitHub is for source-code storage. GitHub Pages is not suitable for this full dashboard because the project requires an Express backend API for login, CSV reading, Excel export, settings, and DT80W logger control.
 
-## Option 2: VPS / Linux Server
+Use one of these deployment options instead:
 
-### Build the Frontend
+- Replit Deployment
+- Local PC/server inside the organization network
+- VPS/cloud server
 
-```bash
-pnpm --filter @workspace/weather-dashboard run build
+---
+
+## Option A — Replit Deployment
+
+This is the easiest option for the current project.
+
+1. Open the project in Replit.
+2. Confirm the project runs correctly in Preview.
+3. Confirm CSV files are in:
+
+```text
+DB/CSV_Files/
 ```
 
-Output: `artifacts/weather-dashboard/dist/`
+4. Click **Deploy**.
+5. Choose the deployment type required by the project.
+6. Configure environment variables using the same keys from `.env.example`.
 
-### Start the Backend
+Recommended safe logger defaults when the DT80W is not connected:
 
-```bash
-export PORT=8080
-export NODE_ENV=production
-pnpm --filter @workspace/api-server run start
+```env
+DT80_ENABLED=false
+DT80_MODE=dry-run
 ```
 
-### Serve with Nginx
+---
 
-```nginx
-server {
-    listen 443 ssl;
-    server_name your-domain.com;
+## Option B — Local PC or Local Server
 
-    location /api/ {
-        proxy_pass http://127.0.0.1:8080;
-    }
+This is recommended for an internal lab or organization network.
 
-    location / {
-        root /srv/weather-dashboard/artifacts/weather-dashboard/dist;
-        try_files $uri /index.html;
-    }
-}
+Typical use:
+
+- A Windows PC runs the dashboard backend and frontend.
+- The Python updater runs by Windows Task Scheduler.
+- The Python updater replaces CSV files in `DB/CSV_Files/` every configured interval.
+- Users on the same network open the dashboard from the PC IP address.
+
+Example:
+
+```text
+http://192.168.1.50:20300
 ```
 
-## Option 3: Windows PC on Local Network
+Keep these folders/files persistent:
 
-1. Follow local setup steps from `setup-local.md`
-2. Find IP: open cmd → `ipconfig` → note IPv4 address (e.g., `192.168.1.50`)
-3. Others on the same network access: `http://192.168.1.50:20300`
-4. Use Windows Task Scheduler to run both servers on startup
-
-## Environment Variables
-
-Copy `.env.example` to `.env`:
-
-```
-PORT=8080
-NODE_ENV=production
-```
-
-## Persistent Data (Must Survive Restarts)
-
-These files must be kept persistent:
-
-```
-artifacts/api-server/data/csv/         ← sensor data
-artifacts/api-server/data/users.json   ← login credentials
+```text
+DB/CSV_Files/
+artifacts/api-server/data/users.json
 artifacts/api-server/data/logger-settings.json
 ```
 
-Back these up regularly.
+---
+
+## Option C — VPS or Cloud Server
+
+Use this option for a more formal production deployment.
+
+### Requirements
+
+- Node.js LTS
+- pnpm
+- Linux server or Windows server
+- Optional Nginx or Caddy reverse proxy
+- HTTPS certificate
+
+### Basic Linux/VPS Flow
+
+```bash
+git clone https://github.com/mo7ammed-saleh/SQU_smart_weather_station.git
+cd SQU_smart_weather_station
+pnpm install
+cp .env.example .env
+pnpm --filter @workspace/weather-dashboard run build
+pnpm --filter @workspace/api-server run start
+```
+
+The frontend build output is under:
+
+```text
+artifacts/weather-dashboard/dist/
+```
+
+The backend API runs on the configured `PORT`, usually `8080`.
+
+### Example Reverse Proxy Concept
+
+Proxy API requests to the backend:
+
+```text
+/api/*  ->  http://127.0.0.1:8080
+```
+
+Serve the frontend from:
+
+```text
+artifacts/weather-dashboard/dist/
+```
+
+---
+
+## Environment Variables
+
+Copy `.env.example` to `.env` and edit as needed.
+
+Important values:
+
+```env
+CSV_DATA_DIR=DB/CSV_Files
+USERS_FILE=artifacts/api-server/data/users.json
+LOGGER_SETTINGS_FILE=artifacts/api-server/data/logger-settings.json
+```
+
+For DT80W direct control, keep safe defaults until the logger is connected and tested:
+
+```env
+DT80_ENABLED=false
+DT80_MODE=dry-run
+```
+
+When ready to control the logger directly:
+
+```env
+DT80_ENABLED=true
+DT80_MODE=tcp
+DT80_IP=192.168.5.50
+DT80_PORT=7700
+```
+
+---
+
+## Persistent Data
+
+These must survive restarts, redeployments, and updates:
+
+```text
+DB/CSV_Files/                         sensor CSV data
+artifacts/api-server/data/users.json  login credentials
+artifacts/api-server/data/logger-settings.json logger interval/status settings
+```
+
+Back them up regularly.
+
+---
+
+## Python CSV Updater in Production
+
+The dashboard does not read DBD files directly.
+
+The Python updater should:
+
+1. Connect to the DT80W FTP server.
+2. Download DBD files.
+3. Convert DBD to CSV using `dump_dbd.exe`.
+4. Save or replace the four CSV files in `DB/CSV_Files/`.
+5. Run automatically using Task Scheduler, cron, or a service.
+6. The dashboard reads the updated CSV files after refresh.
+
+---
 
 ## Security Checklist
 
-- [ ] Change default password immediately (`admin123` → something strong)
-- [ ] Use HTTPS (SSL certificate via Let's Encrypt or Cloudflare)
-- [ ] Do NOT serve the `data/` folder publicly
-- [ ] Set `NODE_ENV=production`
-- [ ] Consider adding rate limiting on `/api/auth/login`
-- [ ] Plan database + hashed passwords migration (see `docs/12_DATABASE_PLAN.md`)
+- Change the default password immediately.
+- Use HTTPS for external access.
+- Do not expose JSON data files or CSV folders directly through the web server.
+- Set `NODE_ENV=production`.
+- Keep `.env` private and never commit it.
+- Keep DT80W direct control disabled until the logger network and port are confirmed.
+- Do not use `DELALLJOBS` for interval changes.
+- Plan a future migration from JSON passwords to database + hashed passwords.
